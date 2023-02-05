@@ -19,6 +19,6 @@
 
 int get_syntax(char *word) { return -1; }
 
-void syntax_nop(struct forth_vm *vm) {}
+void syntax_nop(struct forthvm *vm) {}
 
 opfunc get_syntax_op(enum syntax) { return syntax_nop; }

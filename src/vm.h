@@ -28,7 +28,7 @@
 #include "opcode.h"
 #include "syntax.h"
 
-struct forth_vm {
+struct forthvm {
     data *ds;
     data *rs;
     data *heap;
@@ -59,12 +59,12 @@ struct forth_vm {
     char *curword;
 };
 
-data vm_pop_ds(struct forth_vm *vm);
-void vm_push_ds(struct forth_vm *vm, data d);
-data vm_read_word(struct forth_vm *vm);
-void vm_push_code(struct forth_vm *vm, data d);
+data vm_pop_ds(struct forthvm *vm);
+void vm_push_ds(struct forthvm *vm, data d);
+data vm_read_word(struct forthvm *vm);
+void vm_push_code(struct forthvm *vm, data d);
 
-void vm_init(struct forth_vm *vm, FILE *fin, FILE *fout);
-void vm_run(struct forth_vm *vm);
+void vm_init(struct forthvm *vm, FILE *fin, FILE *fout);
+void vm_run(struct forthvm *vm);
 
 #endif

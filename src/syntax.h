@@ -33,12 +33,12 @@ enum syntax {
 int get_syntax(char *word);
 opfunc get_syntax_op(enum syntax);
 
-void syn_colon(struct forth_vm *vm);
-void syn_semi(struct forth_vm *vm);
-void syn_begin(struct forth_vm *vm);
-void syn_until(struct forth_vm *vm);
-void syn_if(struct forth_vm *vm);
-void syn_else(struct forth_vm *vm);
-void syn_then(struct forth_vm *vm);
+void syn_colon(struct forthvm *vm);
+void syn_semi(struct forthvm *vm);
+void syn_begin(struct forthvm *vm);
+void syn_until(struct forthvm *vm);
+void syn_if(struct forthvm *vm);
+void syn_else(struct forthvm *vm);
+void syn_then(struct forthvm *vm);
 
 #endif

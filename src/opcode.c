@@ -19,10 +19,10 @@
 
 #include "vm.h"
 
-char *op_vec[] = {"+", ".", "call", "push", "create", "bye", "ret", "nop"};
+char *op_vec[] = {"+", ".", "call", "push", "create", "bye", "ret", "jmp", "nop"};
 
 opfunc op_funcvec[] = {
-    op_add, op_dot, op_call, op_push, op_create, op_bye, op_ret, op_nop,
+    op_add, op_dot, op_call, op_push, op_create, op_bye, op_ret, op_jmp, op_nop,
 };
 
 char *get_opname(enum opcode op) { return op_vec[(int)op]; }
@@ -35,7 +35,7 @@ data get_opaddr(enum opcode op)
     return *(data *)&f;
 }
 
-void op_add(struct forth_vm *vm)
+void op_add(struct forthvm *vm)
 {
     data a, b;
     a = vm_pop_ds(vm);
@@ -43,35 +43,45 @@ void op_add(struct forth_vm *vm)
     vm_push_ds(vm, a + b);
 }
 
-void op_dot(struct forth_vm *vm)
+void op_dot(struct forthvm *vm)
 {
     data a = vm_pop_ds(vm);
     fprintf(vm->out, "%ld", a);
 }
 
-void op_push(struct forth_vm *vm)
+void op_push(struct forthvm *vm)
 {
     vm->pc++;
     data a = vm->code[vm->pc];
     vm_push_ds(vm, a);
 }
 
-void op_bye(struct forth_vm *vm)
+void op_bye(struct forthvm *vm)
 {
     vm->finished = true;
     vm->ret = 0;
 }
 
-void op_create(struct forth_vm *vm)
+void op_create(struct forthvm *vm)
 {
+    vm_push_code(vm, get_opaddr(OP_PUSH));
+    vm_push_code(vm, 0);
+    data *jmp_ptr = &vm->code[vm->codesz - 1];
+    vm_push_code(vm, get_opaddr(OP_JMP));
     data a = vm_read_word(vm);
     data b = vm->codesz;
+    vm->dict[a] = b;
     vm_push_code(vm, get_opaddr(OP_PUSH));
     vm_push_code(vm, vm->heaptop);
     vm_push_code(vm, get_opaddr(OP_RET));
-    vm->dict[a] = b;
+    *jmp_ptr = vm->codesz;
 }
 
-void op_ret(struct forth_vm *vm) {}
-void op_call(struct forth_vm *vm) {}
-void op_nop(struct forth_vm *vm) {}
+void op_jmp(struct forthvm *vm) {
+    data addr = vm_pop_ds(vm);
+    vm->pc = addr - 1;
+}
+
+void op_ret(struct forthvm *vm) {}
+void op_call(struct forthvm *vm) {}
+void op_nop(struct forthvm *vm) {}

@@ -1,4 +1,4 @@
-TARGET = rforth
+TARGET = reinforth
 CC = gcc
 LDFLAGS = -g
 CFLAGS = -g -Isrc/

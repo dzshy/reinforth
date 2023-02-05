@@ -19,7 +19,7 @@
 
 int main()
 {
-    struct forth_vm vm;
+    struct forthvm vm;
     int ret;
 
     vm_init(&vm, stdin, stdout);

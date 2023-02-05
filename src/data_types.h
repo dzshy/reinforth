@@ -20,7 +20,7 @@
 
 #include "stdint.h"
 
-struct forth_vm;
+struct forthvm;
 
 typedef intptr_t data;
 
@@ -29,7 +29,7 @@ struct dbldata {
     data d2;
 };
 
-typedef void (*opfunc)(struct forth_vm *);
+typedef void (*opfunc)(struct forthvm *);
 // builtin word: d1 = opcode, d2 = opcode
 // user word: d1 = OP_RUN, d2 = code_ptr
 // created var: d1 = OP_PUSH, d2 = heap_ptr

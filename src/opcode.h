@@ -28,19 +28,21 @@ enum opcode {
     OP_CREATE,
     OP_BYE,
     OP_RET,
+    OP_JMP,
     OP_NOP,
 };
 
-struct forth_vm;
+struct forthvm;
 
-void op_add(struct forth_vm *vm);
-void op_dot(struct forth_vm *vm);
-void op_call(struct forth_vm *vm);
-void op_push(struct forth_vm *vm);
-void op_create(struct forth_vm *vm);
-void op_bye(struct forth_vm *vm);
-void op_ret(struct forth_vm *vm);
-void op_nop(struct forth_vm *vm);
+void op_add(struct forthvm *vm);
+void op_dot(struct forthvm *vm);
+void op_call(struct forthvm *vm);
+void op_push(struct forthvm *vm);
+void op_create(struct forthvm *vm);
+void op_bye(struct forthvm *vm);
+void op_ret(struct forthvm *vm);
+void op_jmp(struct forthvm *vm);
+void op_nop(struct forthvm *vm);
 
 char *get_opname(enum opcode);
 

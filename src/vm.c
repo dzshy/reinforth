@@ -44,7 +44,7 @@ bool word_entry_eq(void *a_, void *b_)
     return false;
 }
 
-static data create_word(struct forth_vm *vm, char *word)
+static data create_word(struct forthvm *vm, char *word)
 {
     char *dup_word = strdup(word);
     vm->dict[vm->dictsz] = -1;
@@ -54,7 +54,7 @@ static data create_word(struct forth_vm *vm, char *word)
     return vm->dictsz - 1;
 }
 
-static data find_word(struct forth_vm *vm, char *word)
+static data find_word(struct forthvm *vm, char *word)
 {
     struct word_entry we;
     we.word = word;
@@ -64,7 +64,7 @@ static data find_word(struct forth_vm *vm, char *word)
     return create_word(vm, word);
 }
 
-data vm_pop_ds(struct forth_vm *vm)
+data vm_pop_ds(struct forthvm *vm)
 {
     if (vm->dsp <= 0) {
         vm->finished = true;
@@ -75,21 +75,21 @@ data vm_pop_ds(struct forth_vm *vm)
     return r;
 }
 
-void vm_push_ds(struct forth_vm *vm, data d)
+void vm_push_ds(struct forthvm *vm, data d)
 {
     vm->dsp++;
     vm->ds[vm->dsp] = d;
 }
 
-void vm_push_code(struct forth_vm *vm, data d)
+void vm_push_code(struct forthvm *vm, data d)
 {
     vm->code[vm->codesz] = d;
     vm->codesz++;
 }
 
-void vm_init(struct forth_vm *vm, FILE *fin, FILE *fout)
+void vm_init(struct forthvm *vm, FILE *fin, FILE *fout)
 {
-    *vm = (struct forth_vm){0};
+    *vm = (struct forthvm){0};
     vm->ds = malloc(1000 * sizeof(data));
     vm->rs = malloc(1000 * sizeof(data));
     vm->heap = malloc(1000 * sizeof(data));
@@ -109,7 +109,7 @@ void vm_init(struct forth_vm *vm, FILE *fin, FILE *fout)
     vm->out = fout;
 }
 
-static data execute(struct forth_vm *vm)
+static data execute(struct forthvm *vm)
 {
     data a, b;
     opfunc func_ptr;
@@ -128,7 +128,7 @@ static data execute(struct forth_vm *vm)
     return ret;
 }
 
-static int compile(struct forth_vm *vm)
+static int compile(struct forthvm *vm)
 {
     struct token tok;
     data entry;
@@ -166,7 +166,7 @@ static int compile(struct forth_vm *vm)
     return 0;
 }
 
-data vm_read_word(struct forth_vm *vm)
+data vm_read_word(struct forthvm *vm)
 {
     struct token tok;
     tok = get_token(vm->in, vm->curword);
@@ -178,7 +178,7 @@ data vm_read_word(struct forth_vm *vm)
     return find_word(vm, vm->curword);
 }
 
-void vm_run(struct forth_vm *vm)
+void vm_run(struct forthvm *vm)
 {
     data ret;
     while (!vm->finished) {
