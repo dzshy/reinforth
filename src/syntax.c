@@ -64,7 +64,7 @@ void syn_nop(struct forthvm *vm) {}
 void syn_colon(struct forthvm *vm) {
     vm_execute(vm);
     if (vm->rsp > 0) {
-        // error
+        vm->errmsg = "wrong place to start word definition";
         vm->finished = true;
         vm->ret = -1;
         return;
@@ -79,7 +79,7 @@ void syn_semi(struct forthvm *vm) {
     enum syntax s = vm_pop_rs(vm);
     if (vm->finished) return;
     if (s != SYN_COLON) {
-        // error
+        vm->errmsg = "unpaired semicolon";
         vm->finished = true;
         vm->ret = -1;
         return;
@@ -96,11 +96,42 @@ void syn_until(struct forthvm *vm) {
 }
 
 void syn_if(struct forthvm *vm) {
+    vm_emit_opcode(vm, OP_JZ);
+    vm_push_rs(vm, vm->codesz);
+    vm_emit_data(vm, -1);
+    vm_push_rs(vm, SYN_IF);
 }
 
 void syn_else(struct forthvm *vm) {
+    data d = vm_pop_rs(vm);
+    if (d != SYN_IF || vm->finished) {
+        vm->errmsg = "unpaired else";
+        vm->finished = true;
+        vm->ret = -1;
+        return;
+    }
+    d = vm_pop_rs(vm);
+    vm_emit_opcode(vm, OP_PUSH);
+    vm_push_rs(vm, vm->codesz);
+    vm_push_rs(vm, SYN_ELSE);
+    vm_emit_opcode(vm, -1);
+    vm_emit_opcode(vm, OP_JMP);
+    vm->code[d] = vm->codesz;
 }
 
 void syn_then(struct forthvm *vm) {
+    data d = vm_pop_rs(vm);
+    if (vm->finished) return;
+    if (d != SYN_IF && d != SYN_ELSE) {
+        // vm->errmsg = "unpaired then";
+        vm->finished = true;
+        vm->ret = -1;
+        return;
+    }
+    d = vm_pop_rs(vm);
+    if (vm->finished) {
+        return;
+    }
+    vm->code[d] = vm->codesz;
 }
 

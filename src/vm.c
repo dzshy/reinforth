@@ -67,6 +67,7 @@ static data find_word(struct forthvm *vm, char *word)
 data vm_pop_ds(struct forthvm *vm)
 {
     if (vm->dsp <= 0) {
+        vm->errmsg = "failed to pop from data stack";
         vm->finished = true;
         vm->ret = -1;
         return -1;
@@ -85,6 +86,7 @@ void vm_push_ds(struct forthvm *vm, data d)
 data vm_pop_rs(struct forthvm *vm)
 {
     if (vm->rsp <= 0) {
+        vm->errmsg = "failed to pop from return stack";
         vm->finished = true;
         vm->ret = -1;
         return -1;
@@ -125,6 +127,7 @@ void vm_init(struct forthvm *vm, FILE *fin, FILE *fout)
     htable_init(vm->wordtable, sizeof(struct word_entry), -1, word_entry_hash,
                 word_entry_eq);
     vm->ready = true;
+    vm->errmsg = "";
 
     for (data i = 0; i < (data)OP_NOP; i++) {
         find_word(vm, get_opname((enum opcode)i));
@@ -196,9 +199,9 @@ data vm_read_word(struct forthvm *vm)
     struct token tok;
     tok = get_token(vm->in, vm->curword);
     if (tok.type != TOK_WORD) {
-        // error
         vm->finished = true;
         vm->ret = -1;
+        vm->errmsg = "next input token is expeted to be a word";
         return -1;
     }
     return find_word(vm, vm->curword);

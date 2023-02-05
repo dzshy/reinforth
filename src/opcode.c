@@ -19,10 +19,10 @@
 
 #include "vm.h"
 
-char *op_vec[] = {"+", ".", "call", "push", "create", "bye", "ret", "jmp", "nop"};
+char *op_vec[] = {"+", "-", "dup", "over", "swap", "drop", ".", "call", "push", "create", "bye", "ret", "jmp", "jz", "nop"};
 
 opfunc op_funcvec[] = {
-    op_add, op_dot, op_call, op_push, op_create, op_bye, op_ret, op_jmp, op_nop,
+    op_add, op_minus, op_dup, op_over, op_swap, op_drop, op_dot, op_call, op_push, op_create, op_bye, op_ret, op_jmp, op_jz, op_nop,
 };
 
 char *get_opname(enum opcode op) { return op_vec[(int)op]; }
@@ -39,14 +39,59 @@ void op_add(struct forthvm *vm)
 {
     data a, b;
     a = vm_pop_ds(vm);
+    if (vm->finished) return;
     b = vm_pop_ds(vm);
+    if (vm->finished) return;
     vm_push_ds(vm, a + b);
+}
+
+void op_minus(struct forthvm *vm) {
+    data a, b;
+    b = vm_pop_ds(vm);
+    if (vm->finished) return;
+    a = vm_pop_ds(vm);
+    if (vm->finished) return;
+    vm_push_ds(vm, a - b);
+}
+
+void op_dup(struct forthvm *vm) {
+    data a;
+    a = vm_pop_ds(vm);
+    if (vm->finished) return;
+    vm_push_ds(vm, a);
+    vm_push_ds(vm, a);
+}
+
+void op_over(struct forthvm *vm) {
+    data a, b;
+    a = vm_pop_ds(vm);
+    if (vm->finished) return;
+    b = vm_pop_ds(vm);
+    if (vm->finished) return;
+    vm_push_ds(vm, b);
+    vm_push_ds(vm, a);
+    vm_push_ds(vm, b);
+}
+
+void op_swap(struct forthvm *vm) {
+    data a, b;
+    a = vm_pop_ds(vm);
+    if (vm->finished) return;
+    b = vm_pop_ds(vm);
+    if (vm->finished) return;
+    vm_push_ds(vm, a);
+    vm_push_ds(vm, b);
+}
+
+void op_drop(struct forthvm *vm) {
+    vm_pop_ds(vm);
 }
 
 void op_dot(struct forthvm *vm)
 {
     data a = vm_pop_ds(vm);
-    fprintf(vm->out, "%ld", a);
+    if (vm->finished) return;
+    fprintf(vm->out, "%ld ", a);
 }
 
 void op_push(struct forthvm *vm)
@@ -82,6 +127,14 @@ void op_jmp(struct forthvm *vm) {
     vm->pc = addr - 1;
 }
 
+void op_jz(struct forthvm *vm) {
+    vm->pc++;
+    data addr = vm->code[vm->pc];
+    data d = vm_pop_ds(vm);
+    if (vm->finished) return;
+    if (d == 0) vm->pc = addr - 1;
+}
+
 void op_ret(struct forthvm *vm)
 {
     data addr = vm_pop_rs(vm);
@@ -95,7 +148,7 @@ void op_call(struct forthvm *vm)
     if (vm->finished) return;
     data addr = vm->dict[entry];
     if (addr < 0) {
-        // error
+        vm->errmsg = "op_call invlid address";
         vm->finished = true;
         vm->ret = -1;
         return;

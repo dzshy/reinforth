@@ -57,6 +57,7 @@ struct forthvm {
     FILE *in;
     FILE *out;
     char *curword;
+    char *errmsg;
 };
 
 data vm_pop_ds(struct forthvm *vm);

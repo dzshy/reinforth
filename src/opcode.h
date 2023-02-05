@@ -22,6 +22,11 @@
 
 enum opcode {
     OP_ADD,
+    OP_MINUS,
+    OP_DUP,
+    OP_OVER,
+    OP_SWAP,
+    OP_DROP,
     OP_DOT,
     OP_CALL,
     OP_PUSH,
@@ -29,12 +34,18 @@ enum opcode {
     OP_BYE,
     OP_RET,
     OP_JMP,
+    OP_JZ,
     OP_NOP,
 };
 
 struct forthvm;
 
 void op_add(struct forthvm *vm);
+void op_minus(struct forthvm *vm);
+void op_dup(struct forthvm *vm);
+void op_over(struct forthvm *vm);
+void op_swap(struct forthvm *vm);
+void op_drop(struct forthvm *vm);
 void op_dot(struct forthvm *vm);
 void op_call(struct forthvm *vm);
 void op_push(struct forthvm *vm);
@@ -42,6 +53,7 @@ void op_create(struct forthvm *vm);
 void op_bye(struct forthvm *vm);
 void op_ret(struct forthvm *vm);
 void op_jmp(struct forthvm *vm);
+void op_jz(struct forthvm *vm);
 void op_nop(struct forthvm *vm);
 
 char *get_opname(enum opcode);

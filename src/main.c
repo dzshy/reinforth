@@ -24,5 +24,9 @@ int main()
 
     vm_init(&vm, stdin, stdout);
     vm_run(&vm);
+    if (vm.ret < 0) {
+        fprintf(stderr, "VM error: %s\n", vm.errmsg);
+    }
     return vm.ret;
 }
+
