@@ -15,8 +15,8 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef SMALL_FORTH_DATA_TYPES_H_
-#define SMALL_FORTH_DATA_TYPES_H_
+#ifndef REINFORTH_DATA_TYPES_H_
+#define REINFORTH_DATA_TYPES_H_
 
 #include "stdint.h"
 

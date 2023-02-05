@@ -15,8 +15,8 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef SMALL_FORTH_SYNTAX_H_
-#define SMALL_FORTH_SYNTAX_H_
+#ifndef REINFORTH_SYNTAX_H_
+#define REINFORTH_SYNTAX_H_
 
 #include "data_types.h"
 

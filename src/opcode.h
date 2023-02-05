@@ -15,8 +15,8 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef SMALL_FORTH_OPCODE_H_
-#define SMALL_FORTH_OPCODE_H_
+#ifndef REINFORTH_OPCODE_H_
+#define REINFORTH_OPCODE_H_
 
 #include "data_types.h"
 

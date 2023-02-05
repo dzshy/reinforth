@@ -15,8 +15,8 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef SMALL_FORTH_TOKEN_H_
-#define SMALL_FORTH_TOKEN_H_
+#ifndef REINFORTH_TOKEN_H_
+#define REINFORTH_TOKEN_H_
 
 #include <stdio.h>
 

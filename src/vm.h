@@ -15,8 +15,8 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef SMALL_FORTH_VM_H_
-#define SMALL_FORTH_VM_H_
+#ifndef REINFORTH_VM_H_
+#define REINFORTH_VM_H_
 
 #include <stdbool.h>
 #include <stdint.h>
