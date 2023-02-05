@@ -34,7 +34,7 @@ char peek_char(FILE *fp)
 void skipspace(FILE *fp)
 {
     char c = peek_char(fp);
-    while (c == ' ' || c == '\t') {
+    while (c == ' ' || c == '\t' || c == '\n' || c== '\r') {
         fgetc(fp);
         c = peek_char(fp);
     }
@@ -75,17 +75,13 @@ data parse_number(FILE *fp, char *buf)
 
 struct token get_token(FILE *fp, char *buf)
 {
-    struct token tok = {TOK_NEWLINE, 0};
+    struct token tok = {TOK_INVALID, 0}; 
     while (1) {
         skipspace(fp);
         char c = peek_char(fp);
         if (c >= '0' && c <= '9') {
             tok.type = TOK_NUM;
             tok.dat = parse_number(fp, buf);
-            return tok;
-        } else if (c == '\n') {
-            fgetc(fp);
-            tok.type = TOK_NEWLINE;
             return tok;
         } else if (c == EOF) {
             tok.type = TOK_EOF;

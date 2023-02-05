@@ -64,16 +64,16 @@ void op_bye(struct forthvm *vm)
 
 void op_create(struct forthvm *vm)
 {
-    vm_push_code(vm, get_opaddr(OP_PUSH));
-    vm_push_code(vm, 0);
+    vm_emit_opcode(vm, OP_PUSH);
+    vm_emit_data(vm, 0);
     data *jmp_ptr = &vm->code[vm->codesz - 1];
-    vm_push_code(vm, get_opaddr(OP_JMP));
+    vm_emit_opcode(vm, OP_JMP);
     data a = vm_read_word(vm);
     data b = vm->codesz;
     vm->dict[a] = b;
-    vm_push_code(vm, get_opaddr(OP_PUSH));
-    vm_push_code(vm, vm->heaptop);
-    vm_push_code(vm, get_opaddr(OP_RET));
+    vm_emit_opcode(vm, OP_PUSH);
+    vm_emit_data(vm, vm->heaptop);
+    vm_emit_opcode(vm, OP_RET);
     *jmp_ptr = vm->codesz;
 }
 

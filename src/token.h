@@ -26,8 +26,8 @@ enum token_type {
     TOK_NUM,
     TOK_WORD,
     TOK_SYNTAX,
-    TOK_NEWLINE,
     TOK_EOF,
+    TOK_INVALID,
 };
 
 struct token {

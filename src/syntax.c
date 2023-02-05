@@ -84,7 +84,7 @@ void syn_semi(struct forthvm *vm) {
         vm->ret = -1;
         return;
     }
-    vm_push_code(vm, get_opaddr(OP_RET));
+    vm_emit_opcode(vm, OP_RET);
     vm->pc = vm->codesz;
     vm->ready = true;
 }

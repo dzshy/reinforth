@@ -100,10 +100,16 @@ void vm_push_rs(struct forthvm *vm, data d)
     vm->rs[vm->rsp] = d;
 }
 
-void vm_push_code(struct forthvm *vm, data d)
+void vm_emit_data(struct forthvm *vm, data d)
 {
     vm->code[vm->codesz] = d;
     vm->codesz++;
+}
+
+void vm_emit_opcode(struct forthvm *vm, enum opcode op)
+{
+    data d = get_opaddr(op);
+    vm_emit_data(vm, d);
 }
 
 void vm_init(struct forthvm *vm, FILE *fin, FILE *fout)
@@ -156,25 +162,23 @@ static int compile(struct forthvm *vm)
         tok = get_token(vm->in, vm->curword);
         switch (tok.type) {
         case TOK_NUM:
-            vm_push_code(vm, get_opaddr(OP_PUSH));
-            vm_push_code(vm, tok.dat);
+            vm_emit_opcode(vm, OP_PUSH);
+            vm_emit_data(vm, tok.dat);
             break;
         case TOK_WORD:
             entry = find_word(vm, vm->curword);
             if (entry < (data)OP_NOP) {
-                vm_push_code(vm, get_opaddr(entry));
+                vm_emit_opcode(vm, entry);
             } else {
-                vm_push_code(vm, get_opaddr(OP_PUSH));
-                vm_push_code(vm, entry);
-                vm_push_code(vm, get_opaddr(OP_CALL));
+                vm_emit_opcode(vm, OP_PUSH);
+                vm_emit_data(vm, entry);
+                vm_emit_opcode(vm, OP_CALL);
             }
+            if (vm->ready) return 1;
             break;
         case TOK_SYNTAX:
             opfunc syntax = get_syntax_op(tok.dat);
             (*syntax)(vm);
-            break;
-        case TOK_NEWLINE:
-            return 1;
             break;
         case TOK_EOF:
             vm_execute(vm);
