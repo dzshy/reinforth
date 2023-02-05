@@ -4,7 +4,7 @@
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all
  * copies.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
  * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
@@ -19,10 +19,26 @@
 
 #include "vm.h"
 
-char *op_vec[] = {"+", "-", "dup", "over", "swap", "drop", ".", "call", "push", "create", "bye", "ret", "jmp", "jz", "nop"};
+#define CHECKERR                                                               \
+    if (unlikely(vm->finished))                                                \
+        return;
+
+#define CHECKDS(len)                                                           \
+    if (unlikely(vm->dsp < len)) {                                             \
+        vm->ret = -1;                                                          \
+        vm->finished = true;                                                   \
+        vm->errmsg = "no enough element on data stack";                        \
+        return;                                                                \
+    }
+
+char *op_vec[] = {"+",    "-",    ">",    "<",  ">=",   "<=",   "dup",
+                  "over", "swap", "drop", ".",  "call", "push", "create",
+                  "bye",  "ret",  "jmp",  "jz", "nop"};
 
 opfunc op_funcvec[] = {
-    op_add, op_minus, op_dup, op_over, op_swap, op_drop, op_dot, op_call, op_push, op_create, op_bye, op_ret, op_jmp, op_jz, op_nop,
+    op_add,  op_minus, op_gt,   op_lt,  op_ge,   op_le,   op_dup,
+    op_over, op_swap,  op_drop, op_dot, op_call, op_push, op_create,
+    op_bye,  op_ret,   op_jmp,  op_jz,  op_nop,
 };
 
 char *get_opname(enum opcode op) { return op_vec[(int)op]; }
@@ -39,58 +55,120 @@ void op_add(struct forthvm *vm)
 {
     data a, b;
     a = vm_pop_ds(vm);
-    if (vm->finished) return;
+    CHECKERR;
     b = vm_pop_ds(vm);
-    if (vm->finished) return;
+    CHECKERR;
     vm_push_ds(vm, a + b);
 }
 
-void op_minus(struct forthvm *vm) {
+void op_minus(struct forthvm *vm)
+{
     data a, b;
     b = vm_pop_ds(vm);
-    if (vm->finished) return;
+    CHECKERR;
     a = vm_pop_ds(vm);
-    if (vm->finished) return;
+    CHECKERR;
     vm_push_ds(vm, a - b);
 }
 
-void op_dup(struct forthvm *vm) {
+void op_gt(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    data r;
+    if (a > b) {
+        r = -1;
+    } else {
+        r = 0;
+    }
+    vm_push_ds(vm, r);
+}
+
+void op_lt(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    data r;
+    if (a < b) {
+        r = -1;
+    } else {
+        r = 0;
+    }
+    vm_push_ds(vm, r);
+}
+
+void op_ge(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    data r;
+    if (a >= b) {
+        r = -1;
+    } else {
+        r = 0;
+    }
+    vm_push_ds(vm, r);
+}
+
+void op_le(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    data r;
+    if (a <= b) {
+        r = -1;
+    } else {
+        r = 0;
+    }
+    vm_push_ds(vm, r);
+}
+
+void op_dup(struct forthvm *vm)
+{
+    CHECKDS(1);
     data a;
-    a = vm_pop_ds(vm);
-    if (vm->finished) return;
-    vm_push_ds(vm, a);
+    a = vm->ds[vm->dsp];
     vm_push_ds(vm, a);
 }
 
-void op_over(struct forthvm *vm) {
-    data a, b;
-    a = vm_pop_ds(vm);
-    if (vm->finished) return;
-    b = vm_pop_ds(vm);
-    if (vm->finished) return;
-    vm_push_ds(vm, b);
+void op_over(struct forthvm *vm)
+{
+    CHECKDS(2);
+    data a = vm->ds[vm->dsp - 1];
     vm_push_ds(vm, a);
-    vm_push_ds(vm, b);
 }
 
-void op_swap(struct forthvm *vm) {
-    data a, b;
-    a = vm_pop_ds(vm);
-    if (vm->finished) return;
-    b = vm_pop_ds(vm);
-    if (vm->finished) return;
-    vm_push_ds(vm, a);
-    vm_push_ds(vm, b);
+void op_swap(struct forthvm *vm)
+{
+    CHECKDS(2);
+    data t;
+    t = vm->ds[vm->dsp];
+    vm->ds[vm->dsp] = vm->ds[vm->dsp - 1];
+    vm->ds[vm->dsp - 1] = t;
 }
 
-void op_drop(struct forthvm *vm) {
-    vm_pop_ds(vm);
+void op_drop(struct forthvm *vm)
+{
+    CHECKDS(1);
+    vm->dsp--;
 }
 
 void op_dot(struct forthvm *vm)
 {
     data a = vm_pop_ds(vm);
-    if (vm->finished) return;
+    CHECKERR;
     fprintf(vm->out, "%ld ", a);
 }
 
@@ -109,10 +187,9 @@ void op_bye(struct forthvm *vm)
 
 void op_create(struct forthvm *vm)
 {
-    vm_emit_opcode(vm, OP_PUSH);
+    vm_emit_opcode(vm, OP_JMP);
     vm_emit_data(vm, 0);
     data *jmp_ptr = &vm->code[vm->codesz - 1];
-    vm_emit_opcode(vm, OP_JMP);
     data a = vm_read_word(vm);
     data b = vm->codesz;
     vm->dict[a] = b;
@@ -122,17 +199,21 @@ void op_create(struct forthvm *vm)
     *jmp_ptr = vm->codesz;
 }
 
-void op_jmp(struct forthvm *vm) {
-    data addr = vm_pop_ds(vm);
+void op_jmp(struct forthvm *vm)
+{
+    vm->pc++;
+    data addr = vm->code[vm->pc];
     vm->pc = addr - 1;
 }
 
-void op_jz(struct forthvm *vm) {
+void op_jz(struct forthvm *vm)
+{
     vm->pc++;
     data addr = vm->code[vm->pc];
     data d = vm_pop_ds(vm);
-    if (vm->finished) return;
-    if (d == 0) vm->pc = addr - 1;
+    CHECKERR;
+    if (d == 0)
+        vm->pc = addr - 1;
 }
 
 void op_ret(struct forthvm *vm)
@@ -143,16 +224,10 @@ void op_ret(struct forthvm *vm)
 
 void op_call(struct forthvm *vm)
 {
-    vm_push_rs(vm, vm->pc);
-    data entry = vm_pop_ds(vm);
-    if (vm->finished) return;
+    vm->pc++;
+    data entry = vm->code[vm->pc];
     data addr = vm->dict[entry];
-    if (addr < 0) {
-        vm->errmsg = "op_call invlid address";
-        vm->finished = true;
-        vm->ret = -1;
-        return;
-    }
+    vm_push_rs(vm, vm->pc);
     vm->pc = addr - 1;
 }
 

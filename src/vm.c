@@ -4,7 +4,7 @@
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all
  * copies.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
  * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
@@ -66,8 +66,8 @@ static data find_word(struct forthvm *vm, char *word)
 
 data vm_pop_ds(struct forthvm *vm)
 {
-    if (vm->dsp <= 0) {
-        vm->errmsg = "failed to pop from data stack";
+    if (unlikely(vm->dsp <= 0)) {
+        vm->errmsg = "pop from data stack failed";
         vm->finished = true;
         vm->ret = -1;
         return -1;
@@ -85,8 +85,8 @@ void vm_push_ds(struct forthvm *vm, data d)
 
 data vm_pop_rs(struct forthvm *vm)
 {
-    if (vm->rsp <= 0) {
-        vm->errmsg = "failed to pop from return stack";
+    if (unlikely(vm->rsp <= 0)) {
+        vm->errmsg = "pop from return stack failed";
         vm->finished = true;
         vm->ret = -1;
         return -1;
@@ -139,14 +139,15 @@ void vm_init(struct forthvm *vm, FILE *fin, FILE *fout)
 
 data vm_execute(struct forthvm *vm)
 {
-    if (!vm->ready) return 0;
+    if (!vm->ready)
+        return 0;
     data a, b;
     opfunc func_ptr;
     data ret = 0;
     enum opcode op;
 
     while (!vm->finished) {
-        if (vm->pc >= vm->codesz) {
+        if (unlikely(vm->pc >= vm->codesz)) {
             break;
         }
         data op_addr = vm->code[vm->pc];
@@ -173,11 +174,11 @@ static int compile(struct forthvm *vm)
             if (entry < (data)OP_NOP) {
                 vm_emit_opcode(vm, entry);
             } else {
-                vm_emit_opcode(vm, OP_PUSH);
-                vm_emit_data(vm, entry);
                 vm_emit_opcode(vm, OP_CALL);
+                vm_emit_data(vm, entry);
             }
-            if (vm->ready) return 1;
+            if (vm->ready)
+                return 1;
             break;
         case TOK_SYNTAX:
             opfunc syntax = get_syntax_op(tok.dat);

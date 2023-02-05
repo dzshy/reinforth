@@ -4,7 +4,7 @@
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all
  * copies.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
  * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
@@ -34,7 +34,7 @@ char peek_char(FILE *fp)
 void skipspace(FILE *fp)
 {
     char c = peek_char(fp);
-    while (c == ' ' || c == '\t' || c == '\n' || c== '\r') {
+    while (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
         fgetc(fp);
         c = peek_char(fp);
     }
@@ -75,7 +75,7 @@ data parse_number(FILE *fp, char *buf)
 
 struct token get_token(FILE *fp, char *buf)
 {
-    struct token tok = {TOK_INVALID, 0}; 
+    struct token tok = {TOK_INVALID, 0};
     while (1) {
         skipspace(fp);
         char c = peek_char(fp);

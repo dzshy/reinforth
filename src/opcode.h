@@ -4,7 +4,7 @@
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all
  * copies.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
  * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
@@ -23,6 +23,10 @@
 enum opcode {
     OP_ADD,
     OP_MINUS,
+    OP_GT,
+    OP_LT,
+    OP_GE,
+    OP_LE,
     OP_DUP,
     OP_OVER,
     OP_SWAP,
@@ -42,6 +46,10 @@ struct forthvm;
 
 void op_add(struct forthvm *vm);
 void op_minus(struct forthvm *vm);
+void op_gt(struct forthvm *vm);
+void op_lt(struct forthvm *vm);
+void op_ge(struct forthvm *vm);
+void op_le(struct forthvm *vm);
 void op_dup(struct forthvm *vm);
 void op_over(struct forthvm *vm);
 void op_swap(struct forthvm *vm);
