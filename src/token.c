@@ -94,8 +94,10 @@ struct token get_token(FILE *fp, char *buf)
             skipcomment(fp);
         } else {
             parse_word(fp, buf);
-            if (get_syntax(buf) >= 0) {
+            int syn_num = get_syntax(buf);
+            if (syn_num >= 0) {
                 tok.type = TOK_SYNTAX;
+                tok.dat = syn_num;
             } else {
                 tok.type = TOK_WORD;
             }

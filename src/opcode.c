@@ -82,6 +82,25 @@ void op_jmp(struct forthvm *vm) {
     vm->pc = addr - 1;
 }
 
-void op_ret(struct forthvm *vm) {}
-void op_call(struct forthvm *vm) {}
+void op_ret(struct forthvm *vm)
+{
+    data addr = vm_pop_rs(vm);
+    vm->pc = addr;
+}
+
+void op_call(struct forthvm *vm)
+{
+    vm_push_rs(vm, vm->pc);
+    data entry = vm_pop_ds(vm);
+    if (vm->finished) return;
+    data addr = vm->dict[entry];
+    if (addr < 0) {
+        // error
+        vm->finished = true;
+        vm->ret = -1;
+        return;
+    }
+    vm->pc = addr - 1;
+}
+
 void op_nop(struct forthvm *vm) {}

@@ -28,6 +28,7 @@ enum syntax {
     SYN_IF,
     SYN_ELSE,
     SYN_THEN,
+    SYN_NOP,
 };
 
 int get_syntax(char *word);
@@ -40,5 +41,6 @@ void syn_until(struct forthvm *vm);
 void syn_if(struct forthvm *vm);
 void syn_else(struct forthvm *vm);
 void syn_then(struct forthvm *vm);
+void syn_nop(struct forthvm *vm);
 
 #endif

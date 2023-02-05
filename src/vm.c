@@ -68,6 +68,7 @@ data vm_pop_ds(struct forthvm *vm)
 {
     if (vm->dsp <= 0) {
         vm->finished = true;
+        vm->ret = -1;
         return -1;
     }
     data r = vm->ds[vm->dsp];
@@ -79,6 +80,24 @@ void vm_push_ds(struct forthvm *vm, data d)
 {
     vm->dsp++;
     vm->ds[vm->dsp] = d;
+}
+
+data vm_pop_rs(struct forthvm *vm)
+{
+    if (vm->rsp <= 0) {
+        vm->finished = true;
+        vm->ret = -1;
+        return -1;
+    }
+    data r = vm->rs[vm->rsp];
+    vm->rsp--;
+    return r;
+}
+
+void vm_push_rs(struct forthvm *vm, data d)
+{
+    vm->rsp++;
+    vm->rs[vm->rsp] = d;
 }
 
 void vm_push_code(struct forthvm *vm, data d)
@@ -109,8 +128,9 @@ void vm_init(struct forthvm *vm, FILE *fin, FILE *fout)
     vm->out = fout;
 }
 
-static data execute(struct forthvm *vm)
+data vm_execute(struct forthvm *vm)
 {
+    if (!vm->ready) return 0;
     data a, b;
     opfunc func_ptr;
     data ret = 0;
@@ -144,8 +164,9 @@ static int compile(struct forthvm *vm)
             if (entry < (data)OP_NOP) {
                 vm_push_code(vm, get_opaddr(entry));
             } else {
-                vm_push_code(vm, get_opaddr(OP_CALL));
+                vm_push_code(vm, get_opaddr(OP_PUSH));
                 vm_push_code(vm, entry);
+                vm_push_code(vm, get_opaddr(OP_CALL));
             }
             break;
         case TOK_SYNTAX:
@@ -156,7 +177,7 @@ static int compile(struct forthvm *vm)
             return 1;
             break;
         case TOK_EOF:
-            execute(vm);
+            vm_execute(vm);
             vm->finished = true;
             break;
         default:
@@ -171,9 +192,10 @@ data vm_read_word(struct forthvm *vm)
     struct token tok;
     tok = get_token(vm->in, vm->curword);
     if (tok.type != TOK_WORD) {
+        // error
         vm->finished = true;
         vm->ret = -1;
-        return OP_NOP;
+        return -1;
     }
     return find_word(vm, vm->curword);
 }
@@ -184,7 +206,6 @@ void vm_run(struct forthvm *vm)
     while (!vm->finished) {
         while (!vm->finished && !compile(vm))
             ;
-        if (vm->ready)
-            execute(vm);
+        vm_execute(vm);
     }
 }

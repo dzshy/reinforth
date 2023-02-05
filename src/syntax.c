@@ -17,8 +17,90 @@
 
 #include "syntax.h"
 
-int get_syntax(char *word) { return -1; }
+#include <string.h>
 
-void syntax_nop(struct forthvm *vm) {}
+#include "opcode.h"
+#include "vm.h"
 
-opfunc get_syntax_op(enum syntax) { return syntax_nop; }
+int get_syntax(char *word) {
+    if (strcmp(word, ":") == 0) {
+        return SYN_COLON;
+    } else if (strcmp(word, ";") == 0) {
+        return SYN_SEMI;
+    } else if (strcmp(word, "begin") == 0) {
+        return SYN_BEGIN;
+    } else if (strcmp(word, "until") == 0) {
+        return SYN_UNTIL;
+    } else if (strcmp(word, "if") == 0) {
+        return SYN_IF;
+    } else if (strcmp(word, "else") == 0) {
+        return SYN_ELSE;
+    } else if (strcmp(word, "then") == 0) {
+        return SYN_THEN;
+    }
+    return -1;
+}
+
+
+opfunc syntax_ops[] = {
+    syn_colon,
+    syn_semi,
+    syn_begin,
+    syn_until,
+    syn_if,
+    syn_else,
+    syn_then,
+    syn_nop,
+};
+
+opfunc get_syntax_op(enum syntax s)
+{
+    if (s > SYN_NOP) return syn_nop;
+    return syntax_ops[(int)s];
+}
+
+void syn_nop(struct forthvm *vm) {}
+
+void syn_colon(struct forthvm *vm) {
+    vm_execute(vm);
+    if (vm->rsp > 0) {
+        // error
+        vm->finished = true;
+        vm->ret = -1;
+        return;
+    }
+    data entry = vm_read_word(vm);
+    vm->dict[entry] = vm->codesz;
+    vm_push_rs(vm, SYN_COLON);
+    vm->ready = false;
+}
+
+void syn_semi(struct forthvm *vm) {
+    enum syntax s = vm_pop_rs(vm);
+    if (vm->finished) return;
+    if (s != SYN_COLON) {
+        // error
+        vm->finished = true;
+        vm->ret = -1;
+        return;
+    }
+    vm_push_code(vm, get_opaddr(OP_RET));
+    vm->pc = vm->codesz;
+    vm->ready = true;
+}
+
+void syn_begin(struct forthvm *vm) {
+}
+
+void syn_until(struct forthvm *vm) {
+}
+
+void syn_if(struct forthvm *vm) {
+}
+
+void syn_else(struct forthvm *vm) {
+}
+
+void syn_then(struct forthvm *vm) {
+}
+

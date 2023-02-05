@@ -61,9 +61,12 @@ struct forthvm {
 
 data vm_pop_ds(struct forthvm *vm);
 void vm_push_ds(struct forthvm *vm, data d);
+data vm_pop_rs(struct forthvm *vm);
+void vm_push_rs(struct forthvm *vm, data d);
 data vm_read_word(struct forthvm *vm);
 void vm_push_code(struct forthvm *vm, data d);
 
+data vm_execute(struct forthvm *vm);
 void vm_init(struct forthvm *vm, FILE *fin, FILE *fout);
 void vm_run(struct forthvm *vm);
 
