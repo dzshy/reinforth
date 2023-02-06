@@ -44,7 +44,8 @@ bool word_entry_eq(void *a_, void *b_)
     return false;
 }
 
-static void *make_space(void *buf, data *cap, data idx) {
+static void *make_space(void *buf, data *cap, data idx)
+{
     if (*cap <= idx) {
         void *newbuf = realloc(buf, sizeof(data) * idx * 2);
         *cap = idx * 2;

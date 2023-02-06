@@ -31,14 +31,14 @@
         return;                                                                \
     }
 
-char *op_vec[] = {"+",    "-",    ">",    "<",  ">=",   "<=",   "dup",
-                  "over", "swap", "drop", ".",  "call", "push", "create",
-                  "bye",  "ret",  "jmp",  "jz", "nop"};
+char *op_vec[] = {
+    "+",    "-", "=",    ">",    "<",      ">=",  "<=",  "dup", "over", "swap",
+    "drop", ".", "call", "push", "create", "bye", "ret", "jmp", "jz",   "nop"};
 
 opfunc op_funcvec[] = {
-    op_add,  op_minus, op_gt,   op_lt,  op_ge,   op_le,   op_dup,
-    op_over, op_swap,  op_drop, op_dot, op_call, op_push, op_create,
-    op_bye,  op_ret,   op_jmp,  op_jz,  op_nop,
+    op_add,    op_minus, op_eq,   op_gt,   op_lt,  op_ge,   op_le,
+    op_dup,    op_over,  op_swap, op_drop, op_dot, op_call, op_push,
+    op_create, op_bye,   op_ret,  op_jmp,  op_jz,  op_nop,
 };
 
 char *get_opname(enum opcode op) { return op_vec[(int)op]; }
@@ -69,6 +69,19 @@ void op_minus(struct forthvm *vm)
     a = vm_pop_ds(vm);
     CHECKERR;
     vm_push_ds(vm, a - b);
+}
+
+void op_eq(struct forthvm *vm)
+{
+    data a, b;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    if (a == b)
+        vm_push_ds(vm, -1);
+    else
+        vm_push_ds(vm, 0);
 }
 
 void op_gt(struct forthvm *vm)

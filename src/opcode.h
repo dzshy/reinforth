@@ -23,6 +23,7 @@
 enum opcode {
     OP_ADD,
     OP_MINUS,
+    OP_EQ,
     OP_GT,
     OP_LT,
     OP_GE,
@@ -46,6 +47,7 @@ struct forthvm;
 
 void op_add(struct forthvm *vm);
 void op_minus(struct forthvm *vm);
+void op_eq(struct forthvm *vm);
 void op_gt(struct forthvm *vm);
 void op_lt(struct forthvm *vm);
 void op_ge(struct forthvm *vm);

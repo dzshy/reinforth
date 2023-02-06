@@ -1,7 +1,7 @@
 TARGET = reinforth
 CC = gcc
-LDFLAGS = -g -O2
-CFLAGS = -g -O2 -Isrc/
+LDFLAGS = -g
+CFLAGS = -g -Isrc/
 
 src =$(shell find src/ -name '*.c' -not -name 'main.c')
 obj = $(src:.c=.o)

@@ -17,7 +17,7 @@
 
 #include "vm.h"
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     struct forthvm vm;
     int ret;

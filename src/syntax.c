@@ -77,7 +77,7 @@ void syn_semi(struct forthvm *vm)
     if (vm->finished)
         return;
     if (s != SYN_COLON) {
-        vm->errmsg = "unpaired semicolon";
+        vm->errmsg = "expect semicolon";
         vm->finished = true;
         vm->ret = -1;
         return;
@@ -122,7 +122,7 @@ void syn_then(struct forthvm *vm)
     if (vm->finished)
         return;
     if (d != SYN_IF && d != SYN_ELSE) {
-        // vm->errmsg = "unpaired then";
+        vm->errmsg = "expect if or else before then";
         vm->finished = true;
         vm->ret = -1;
         return;
