@@ -203,6 +203,11 @@ void op_jmp(struct forthvm *vm)
 {
     vm->pc++;
     data addr = vm->code[vm->pc];
+    if (addr < 0) {
+        vm->finished = true;
+        vm->ret = -1;
+        vm->errmsg = "failed to jmp, invalid address";
+    }
     vm->pc = addr - 1;
 }
 
@@ -210,6 +215,11 @@ void op_jz(struct forthvm *vm)
 {
     vm->pc++;
     data addr = vm->code[vm->pc];
+    if (addr < 0) {
+        vm->finished = true;
+        vm->ret = -1;
+        vm->errmsg = "failed to jz, invalid address";
+    }
     data d = vm_pop_ds(vm);
     CHECKERR;
     if (d == 0)
@@ -227,6 +237,11 @@ void op_call(struct forthvm *vm)
     vm->pc++;
     data entry = vm->code[vm->pc];
     data addr = vm->dict[entry];
+    if (addr < 0) {
+        vm->finished = true;
+        vm->ret = -1;
+        vm->errmsg = "undefined word";
+    }
     vm_push_rs(vm, vm->pc);
     vm->pc = addr - 1;
 }

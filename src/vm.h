@@ -50,7 +50,7 @@ struct forthvm {
     data rscap;
     data heapcap;
     data dictcap;
-    data wordrepocap;
+    data codecap;
 
     bool ready;
     bool finished;

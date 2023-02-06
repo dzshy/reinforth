@@ -44,9 +44,19 @@ bool word_entry_eq(void *a_, void *b_)
     return false;
 }
 
+static void *make_space(void *buf, data *cap, data idx) {
+    if (*cap <= idx) {
+        void *newbuf = realloc(buf, sizeof(data) * idx * 2);
+        *cap = idx * 2;
+        return newbuf;
+    }
+    return buf;
+}
+
 static data create_word(struct forthvm *vm, char *word)
 {
     char *dup_word = strdup(word);
+    vm->dict = make_space(vm->dict, &vm->dictcap, vm->dictsz);
     vm->dict[vm->dictsz] = -1;
     struct word_entry we = (struct word_entry){dup_word, vm->dictsz};
     htable_insert(vm->wordtable, &we);
@@ -80,6 +90,7 @@ data vm_pop_ds(struct forthvm *vm)
 void vm_push_ds(struct forthvm *vm, data d)
 {
     vm->dsp++;
+    vm->ds = make_space(vm->ds, &vm->dscap, vm->dsp);
     vm->ds[vm->dsp] = d;
 }
 
@@ -99,11 +110,13 @@ data vm_pop_rs(struct forthvm *vm)
 void vm_push_rs(struct forthvm *vm, data d)
 {
     vm->rsp++;
+    vm->rs = make_space(vm->rs, &vm->rscap, vm->rsp);
     vm->rs[vm->rsp] = d;
 }
 
 void vm_emit_data(struct forthvm *vm, data d)
 {
+    vm->code = make_space(vm->code, &vm->codecap, vm->codesz);
     vm->code[vm->codesz] = d;
     vm->codesz++;
 }
@@ -117,11 +130,19 @@ void vm_emit_opcode(struct forthvm *vm, enum opcode op)
 void vm_init(struct forthvm *vm, FILE *fin, FILE *fout)
 {
     *vm = (struct forthvm){0};
-    vm->ds = malloc(1000 * sizeof(data));
-    vm->rs = malloc(1000 * sizeof(data));
-    vm->heap = malloc(1000 * sizeof(data));
-    vm->dict = malloc(1000 * sizeof(data));
-    vm->code = malloc(1000 * sizeof(data));
+
+    vm->ds = malloc(1024 * sizeof(data));
+    vm->rs = malloc(1024 * sizeof(data));
+    vm->heap = malloc(1024 * sizeof(data));
+    vm->dict = malloc(1024 * sizeof(data));
+    vm->code = malloc(1024 * sizeof(data));
+
+    vm->dscap = 1024;
+    vm->rscap = 1024;
+    vm->heapcap = 1024;
+    vm->dictcap = 1024;
+    vm->codecap = 1024;
+
     vm->curword = malloc(1024);
     vm->wordtable = malloc(sizeof(HTable));
     htable_init(vm->wordtable, sizeof(struct word_entry), -1, word_entry_hash,
