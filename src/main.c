@@ -17,12 +17,20 @@
 
 #include "vm.h"
 
-int main()
+int main(int argc, char** argv)
 {
     struct forthvm vm;
     int ret;
 
-    vm_init(&vm, stdin, stdout);
+    FILE *fin = stdin;
+    if (argc > 1) {
+        fin = fopen(argv[1], "r");
+        if (fin == NULL) {
+            fprintf(stderr, "Failed to open file: %s\n", argv[1]);
+            exit(EXIT_FAILURE);
+        }
+    }
+    vm_init(&vm, fin, stdout);
     vm_run(&vm);
     if (vm.ret < 0) {
         fprintf(stderr, "VM error: %s\n", vm.errmsg);
