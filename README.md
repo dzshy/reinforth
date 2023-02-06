@@ -32,7 +32,7 @@ And it's unlimited. See how deep you can get before OOM:
 
 ## Use before declaration
 
-You can use bar before it's declaration.
+You can use `bar` before its declaration.
 
 ```
 : foo bar ;
