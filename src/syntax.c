@@ -31,7 +31,7 @@ opfunc syntax_ops[] = {
 
 int get_syntax(char *word)
 {
-    for (int i = 0 ; i < SYN_NOP; i++) {
+    for (int i = 0; i < SYN_NOP; i++) {
         if (strcmp(word, syntax_name[i]) == 0) {
             return i;
         }

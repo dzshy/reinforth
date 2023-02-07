@@ -32,16 +32,18 @@
     }
 
 char *op_vec[] = {
-    "+",      "-",    "*",    "/",     "mod",  "/mod", "min",    "max",
-    "negate", "=",    "<>",   ">",     "<",    ">=",   "<=",     "dup",
-    "over",   "swap", "drop", ".",     "call", "push", "create", "bye",
-    "ret",    "jmp",  "jz",   "allot", "!",    "@",    "nop"};
+    "+",      "-",    "*",      "/",     "mod",    "/mod",   "min", "max",
+    "negate", "=",    "<>",     ">",     "<",      ">=",     "<=",  "and",
+    "or",     "not",  "bitand", "bitor", "invert", "xor",    "dup", "over",
+    "swap",   "drop", ".",      "call",  "push",   "create", "bye", "ret",
+    "jmp",    "jz",   "allot",  "!",     "@",      "nop"};
 
 opfunc op_funcvec[] = {
-    op_add,  op_minus,  op_mul,  op_div,  op_mod,  op_divmod, op_min,
-    op_max,  op_negate, op_eq,   op_neq,  op_gt,   op_lt,     op_ge,
-    op_le,   op_dup,    op_over, op_swap, op_drop, op_dot,    op_call,
-    op_push, op_create, op_bye,  op_ret,  op_jmp,  op_jz,     op_allot,
+    op_add,  op_minus,  op_mul,  op_div,  op_mod,    op_divmod, op_min,
+    op_max,  op_negate, op_eq,   op_neq,  op_gt,     op_lt,     op_ge,
+    op_le,   op_and,    op_or,   op_not,  op_bitand, op_bitor,  op_invert,
+    op_xor,  op_dup,    op_over, op_swap, op_drop,   op_dot,    op_call,
+    op_push, op_create, op_bye,  op_ret,  op_jmp,    op_jz,     op_allot,
     op_bang, op_at,     op_nop,
 };
 
@@ -232,6 +234,72 @@ void op_le(struct forthvm *vm)
         r = 0;
     }
     vm_push_ds(vm, r);
+}
+
+void op_and(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, a && b ? -1 : 0);
+}
+
+void op_or(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, a || b ? -1 : 0);
+}
+
+void op_not(struct forthvm *vm)
+{
+    data a;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, a ? 0 : -1);
+}
+
+void op_bitand(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, a & b);
+}
+
+void op_bitor(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, a | b);
+}
+
+void op_invert(struct forthvm *vm)
+{
+    data a;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, ~a);
+}
+
+void op_xor(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, a ^ b);
 }
 
 void op_dup(struct forthvm *vm)

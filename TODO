@@ -21,15 +21,6 @@ repeat
 leave
 again
 
-and
-or
-not
-
-bitand
-bitor
-invert
-bitxor
-
 execute
 '
 cfunc

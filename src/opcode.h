@@ -36,6 +36,13 @@ enum opcode {
     OP_LT,
     OP_GE,
     OP_LE,
+    OP_AND,
+    OP_OR,
+    OP_NOT,
+    OP_BITAND,
+    OP_BITOR,
+    OP_INVERT,
+    OP_XOR,
     OP_DUP,
     OP_OVER,
     OP_SWAP,
@@ -71,6 +78,13 @@ void op_gt(struct forthvm *vm);
 void op_lt(struct forthvm *vm);
 void op_ge(struct forthvm *vm);
 void op_le(struct forthvm *vm);
+void op_and(struct forthvm *vm);
+void op_or(struct forthvm *vm);
+void op_not(struct forthvm *vm);
+void op_bitand(struct forthvm *vm);
+void op_bitor(struct forthvm *vm);
+void op_invert(struct forthvm *vm);
+void op_xor(struct forthvm *vm);
 void op_dup(struct forthvm *vm);
 void op_over(struct forthvm *vm);
 void op_swap(struct forthvm *vm);
