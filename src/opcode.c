@@ -32,14 +32,17 @@
     }
 
 char *op_vec[] = {
-    "+",    "-",    "=",    ">",     "<",    ">=",   "<=",     "dup",
-    "over", "swap", "drop", ".",     "call", "push", "create", "bye",
-    "ret",  "jmp",  "jz",   "allot", "!",    "@",    "nop"};
+    "+",      "-",    "*",    "/",     "mod",  "/mod", "min",    "max",
+    "negate", "=",    "<>",   ">",     "<",    ">=",   "<=",     "dup",
+    "over",   "swap", "drop", ".",     "call", "push", "create", "bye",
+    "ret",    "jmp",  "jz",   "allot", "!",    "@",    "nop"};
 
 opfunc op_funcvec[] = {
-    op_add,  op_minus, op_eq,   op_gt,    op_lt,   op_ge,   op_le,     op_dup,
-    op_over, op_swap,  op_drop, op_dot,   op_call, op_push, op_create, op_bye,
-    op_ret,  op_jmp,   op_jz,   op_allot, op_bang, op_at,   op_nop,
+    op_add,  op_minus,  op_mul,  op_div,  op_mod,  op_divmod, op_min,
+    op_max,  op_negate, op_eq,   op_neq,  op_gt,   op_lt,     op_ge,
+    op_le,   op_dup,    op_over, op_swap, op_drop, op_dot,    op_call,
+    op_push, op_create, op_bye,  op_ret,  op_jmp,  op_jz,     op_allot,
+    op_bang, op_at,     op_nop,
 };
 
 char *get_opname(enum opcode op) { return op_vec[(int)op]; }
@@ -72,6 +75,75 @@ void op_minus(struct forthvm *vm)
     vm_push_ds(vm, a - b);
 }
 
+void op_mul(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, a * b);
+}
+
+void op_div(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, a / b);
+}
+
+void op_mod(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, a % b);
+}
+
+void op_divmod(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, a % b);
+    vm_push_ds(vm, a / b);
+}
+
+void op_min(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, a < b ? a : b);
+}
+
+void op_max(struct forthvm *vm)
+{
+    data a, b;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, a > b ? a : b);
+}
+
+void op_negate(struct forthvm *vm)
+{
+    data a;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, -a);
+}
+
 void op_eq(struct forthvm *vm)
 {
     data a, b;
@@ -83,6 +155,19 @@ void op_eq(struct forthvm *vm)
         vm_push_ds(vm, -1);
     else
         vm_push_ds(vm, 0);
+}
+
+void op_neq(struct forthvm *vm)
+{
+    data a, b;
+    a = vm_pop_ds(vm);
+    CHECKERR;
+    b = vm_pop_ds(vm);
+    CHECKERR;
+    if (a == b)
+        vm_push_ds(vm, 0);
+    else
+        vm_push_ds(vm, -1);
 }
 
 void op_gt(struct forthvm *vm)

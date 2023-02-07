@@ -79,7 +79,7 @@ struct token get_token(FILE *fp, char *buf)
     while (1) {
         skipspace(fp);
         char c = peek_char(fp);
-        if (c >= '0' && c <= '9') {
+        if (c >= '0' && c <= '9' || c == '-') {
             tok.type = TOK_NUM;
             tok.dat = parse_number(fp, buf);
             return tok;

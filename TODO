@@ -1,11 +1,3 @@
-/
-*
-mod
-/mod
-<>
-min
-max
-negate
 ,
 here
 ""
@@ -23,6 +15,7 @@ do
 loop
 +loop
 i
+j
 while
 repeat
 leave
