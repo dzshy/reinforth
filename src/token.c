@@ -78,8 +78,11 @@ struct token get_token(FILE *fp, char *buf)
     struct token tok = {TOK_INVALID, 0};
     while (1) {
         skipspace(fp);
-        char c = peek_char(fp);
-        if (c >= '0' && c <= '9' || c == '-') {
+        char c = fgetc(fp);
+        char c1 = fgetc(fp);
+        if (c1 != EOF) ungetc(c1, fp);
+        if (c != EOF) ungetc(c, fp);
+        if (c >= '0' && c <= '9' || c == '-' && !isspace(c1)) {
             tok.type = TOK_NUM;
             tok.dat = parse_number(fp, buf);
             return tok;

@@ -22,30 +22,22 @@
 #include "opcode.h"
 #include "vm.h"
 
-int get_syntax(char *word)
-{
-    if (strcmp(word, ":") == 0) {
-        return SYN_COLON;
-    } else if (strcmp(word, ";") == 0) {
-        return SYN_SEMI;
-    } else if (strcmp(word, "begin") == 0) {
-        return SYN_BEGIN;
-    } else if (strcmp(word, "until") == 0) {
-        return SYN_UNTIL;
-    } else if (strcmp(word, "if") == 0) {
-        return SYN_IF;
-    } else if (strcmp(word, "else") == 0) {
-        return SYN_ELSE;
-    } else if (strcmp(word, "then") == 0) {
-        return SYN_THEN;
-    }
-    return -1;
-}
+char *syntax_name[] = {":", ";", "begin", "until", "if", "else", "then"};
 
 opfunc syntax_ops[] = {
     syn_colon, syn_semi, syn_begin, syn_until,
     syn_if,    syn_else, syn_then,  syn_nop,
 };
+
+int get_syntax(char *word)
+{
+    for (int i = 0 ; i < SYN_NOP; i++) {
+        if (strcmp(word, syntax_name[i]) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 opfunc get_syntax_op(enum syntax s)
 {
