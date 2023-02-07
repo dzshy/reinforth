@@ -1,13 +1,20 @@
-,
-""
-*
 /
+*
+mod
+/mod
+<>
+min
+max
 negate
+,
+here
+""
+print
+println
 cr
 
 rot
 pick
-rpick
 emit
 print
 println
@@ -19,6 +26,7 @@ i
 while
 repeat
 leave
+again
 
 and
 or
@@ -31,8 +39,9 @@ bitxor
 
 execute
 '
+cfunc
 
 r>
 >r
 r@
-
+rpick
