@@ -1,26 +1,28 @@
 TARGET = reinforth
 CC = gcc
-LDFLAGS = -g
-CFLAGS = -g -Isrc/
+INCLUDEP_PATH=-Isrc/
+
+LDFLAGS = $(shell sh scripts/ldflags.sh)
+CFLAGS = $(shell sh scripts/cflags.sh) $(INCLUDE_PATH)
 
 src =$(shell find src/ -name '*.c' -not -name 'main.c')
 obj = $(src:.c=.o)
 
-tests=$(shell find tests/ -name '*.c')
-tests_bin=$(tests:.c=.bin)
+# tests=$(shell find tests/ -name '*.c')
+# tests_bin=$(tests:.c=.bin)
 
 all: $(TARGET)
 
 $(TARGET): $(obj) src/main.c
 	$(CC) $(LDFLAGS) -o $@ $(obj) src/main.c
  
-#test: $(tests_bin)
-#	@echo
-#	@echo "Run tests:"
-#	@scripts/runall.sh $^
+# test: $(tests_bin)
+# 	@echo
+# 	@echo "Run tests:"
+# 	@scripts/runall.sh $^
 
-#$(tests_bin):%.bin:%.c $(obj)
-#	$(CC) $(CFLAGS) $(LDFLAGS) $< $(obj) -MD -MF $@.d -o $@
+# $(tests_bin):%.bin:%.c $(obj)
+# 	$(CC) $(CFLAGS) $(LDFLAGS) $< $(obj) -MD -MF $@.d -o $@
 
 $(obj):%.o:%.c
 	$(CC) -c $(CFLAGS) $< -MD -MF $@.d -o $@
@@ -33,9 +35,6 @@ clean:
 
 fmt:
 	-scripts/format.sh
-
-install: $(TARGET)
-	cp $(TARGET) ~/.local/bin/
 
 DEPS := $(shell find . -name *.d)
 ifneq ($(DEPS),)

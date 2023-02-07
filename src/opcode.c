@@ -32,13 +32,14 @@
     }
 
 char *op_vec[] = {
-    "+",    "-", "=",    ">",    "<",      ">=",  "<=",  "dup", "over", "swap",
-    "drop", ".", "call", "push", "create", "bye", "ret", "jmp", "jz",   "nop"};
+    "+",    "-",    "=",    ">",     "<",    ">=",   "<=",     "dup",
+    "over", "swap", "drop", ".",     "call", "push", "create", "bye",
+    "ret",  "jmp",  "jz",   "allot", "!",    "@",    "nop"};
 
 opfunc op_funcvec[] = {
-    op_add,    op_minus, op_eq,   op_gt,   op_lt,  op_ge,   op_le,
-    op_dup,    op_over,  op_swap, op_drop, op_dot, op_call, op_push,
-    op_create, op_bye,   op_ret,  op_jmp,  op_jz,  op_nop,
+    op_add,  op_minus, op_eq,   op_gt,    op_lt,   op_ge,   op_le,     op_dup,
+    op_over, op_swap,  op_drop, op_dot,   op_call, op_push, op_create, op_bye,
+    op_ret,  op_jmp,   op_jz,   op_allot, op_bang, op_at,   op_nop,
 };
 
 char *get_opname(enum opcode op) { return op_vec[(int)op]; }
@@ -257,6 +258,30 @@ void op_call(struct forthvm *vm)
     }
     vm_push_rs(vm, vm->pc);
     vm->pc = addr - 1;
+}
+
+void op_allot(struct forthvm *vm)
+{
+    data size = vm_pop_ds(vm);
+    CHECKERR;
+    vm_heap_grow(vm, size);
+    CHECKERR;
+}
+
+void op_bang(struct forthvm *vm)
+{
+    data addr = vm_pop_ds(vm);
+    CHECKERR;
+    data x = vm_pop_ds(vm);
+    CHECKERR;
+    vm->heap[addr] = x;
+}
+
+void op_at(struct forthvm *vm)
+{
+    data addr = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_ds(vm, vm->heap[addr]);
 }
 
 void op_nop(struct forthvm *vm) {}

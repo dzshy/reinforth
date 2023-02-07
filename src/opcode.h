@@ -40,6 +40,9 @@ enum opcode {
     OP_RET,
     OP_JMP,
     OP_JZ,
+    OP_ALLOT,
+    OP_BANG,
+    OP_AT,
     OP_NOP,
 };
 
@@ -64,10 +67,14 @@ void op_bye(struct forthvm *vm);
 void op_ret(struct forthvm *vm);
 void op_jmp(struct forthvm *vm);
 void op_jz(struct forthvm *vm);
+void op_allot(struct forthvm *vm);
+void op_bang(struct forthvm *vm);
+void op_at(struct forthvm *vm);
 void op_nop(struct forthvm *vm);
 
 char *get_opname(enum opcode);
 
 opfunc get_opfunc(enum opcode op);
 data get_opaddr(enum opcode op);
+
 #endif

@@ -183,6 +183,7 @@ data vm_execute(struct forthvm *vm)
 static int compile(struct forthvm *vm)
 {
     struct token tok;
+    opfunc fn;
     data entry;
     while (!vm->finished) {
         tok = get_token(vm->in, vm->curword);
@@ -203,8 +204,8 @@ static int compile(struct forthvm *vm)
                 return 1;
             break;
         case TOK_SYNTAX:
-            opfunc syntax = get_syntax_op(tok.dat);
-            (*syntax)(vm);
+            fn = get_syntax_op(tok.dat);
+            (*fn)(vm);
             break;
         case TOK_EOF:
             vm_execute(vm);
@@ -215,6 +216,15 @@ static int compile(struct forthvm *vm)
         }
     }
     return 0;
+}
+
+void vm_heap_grow(struct forthvm *vm, data size)
+{
+    if (vm->heaptop + size < vm->heapcap) {
+        vm->heaptop += size;
+        return;
+    }
+    vm->heap = make_space(vm->heap, &vm->heapcap, vm->heaptop + size);
 }
 
 data vm_read_word(struct forthvm *vm)

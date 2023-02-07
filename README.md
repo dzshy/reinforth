@@ -4,6 +4,20 @@
 
 A small implementation of Forth for fun.
 
+## Build
+
+Debug version:
+
+```
+make
+```
+
+Release version:
+
+```
+RELEASE=1 make
+```
+
 ## Examples
 
 ### Recursion
@@ -54,7 +68,7 @@ And it's unlimited. See how deep you can get before OOM:
 0 count
 ```
 
-## Use before declaration
+### Use before declaration
 
 You can use `bar` before its declaration.
 
@@ -65,7 +79,7 @@ You can use `bar` before its declaration.
 foo
 ```
 
-But be careful not to get a undefined word:
+But be careful not to get an undefined word:
 
 ```
 : foo a_not_defined_word ;
@@ -73,3 +87,11 @@ But be careful not to get a undefined word:
 foo ( error! )
 ```
 
+### Variable
+
+```
+: variable create 1 allot ;
+variable var
+42 var !
+var @ .
+```
