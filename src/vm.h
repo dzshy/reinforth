@@ -31,7 +31,7 @@
 struct forthvm {
     data *ds;
     data *rs;
-    data *heap;
+    void *heap;
     data *dict;
     data *code;
     HTable *wordtable;
@@ -39,7 +39,7 @@ struct forthvm {
     data pc;
     data dsp;
     data rsp;
-    data heaptop;
+    void *heaptop;
     data ret;
 
     data codesz;
@@ -48,8 +48,8 @@ struct forthvm {
 
     data dscap;
     data rscap;
-    data heapcap;
     data dictcap;
+    data heapcap;
     data codecap;
 
     bool ready;

@@ -37,6 +37,10 @@ fmt:
 	-scripts/format.sh
 
 DEPS := $(shell find . -name *.d)
+
+install: $(TARGET)
+	cp reinforth /usr/local/bin
+
 ifneq ($(DEPS),)
 include $(DEPS)
 endif

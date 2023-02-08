@@ -134,13 +134,14 @@ void vm_init(struct forthvm *vm, FILE *fin, FILE *fout)
 
     vm->ds = malloc(1024 * sizeof(data));
     vm->rs = malloc(1024 * sizeof(data));
-    vm->heap = malloc(1024 * sizeof(data));
+    vm->heap = malloc(4096);
     vm->dict = malloc(1024 * sizeof(data));
     vm->code = malloc(1024 * sizeof(data));
+    vm->heaptop = vm->heap;
 
     vm->dscap = 1024;
     vm->rscap = 1024;
-    vm->heapcap = 1024;
+    vm->heapcap = 4096;
     vm->dictcap = 1024;
     vm->codecap = 1024;
 
@@ -220,11 +221,13 @@ static int compile(struct forthvm *vm)
 
 void vm_heap_grow(struct forthvm *vm, data size)
 {
-    if (vm->heaptop + size < vm->heapcap) {
+    if (vm->heaptop + size - vm->heap <= vm->heapcap) {
         vm->heaptop += size;
         return;
     }
-    vm->heap = make_space(vm->heap, &vm->heapcap, vm->heaptop + size);
+    vm->finished = true;
+    vm->ret = -1;
+    vm->errmsg = "failed to allot memory";
 }
 
 data vm_read_word(struct forthvm *vm)

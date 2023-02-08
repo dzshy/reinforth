@@ -1,21 +1,24 @@
 ,
 here
+load
+
 ""
 print
-println
-cr
+?println
+emit
+?cr
+exit
+?assert
+dump
+dumpr
 
 rot
+depth
 pick
-emit
-print
-println
 
 do
 loop
 +loop
-i
-j
 while
 repeat
 leave
@@ -29,3 +32,6 @@ r>
 >r
 r@
 rpick
+?i
+?j
+

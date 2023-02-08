@@ -1,4 +1,4 @@
-: variable create 1 allot ;
+: variable create 1 cells allot ;
 
 variable var
 
