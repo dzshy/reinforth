@@ -20,11 +20,17 @@ RELEASE=1 make
 
 ## Examples
 
+### Hello, World
+
+```forth
+"hello, world" print cr
+```
+
 ### Recursion
 
 Unlike other Forth, you can do recursion directly.
 
-```
+```forth
 : fibo ( recursive fibonacci )
     dup 2 < if
         1 swap drop
@@ -37,7 +43,7 @@ Unlike other Forth, you can do recursion directly.
 ```
 Or mutual recursion:
 
-```
+```forth
 : is_even
     dup 0 = if
         drop 1
@@ -62,7 +68,7 @@ Or mutual recursion:
 
 And it's unlimited. See how deep you can get before OOM:
 
-```
+```forth
 : count 1 + dup . count ;
 
 0 count
@@ -72,7 +78,7 @@ And it's unlimited. See how deep you can get before OOM:
 
 You can use `bar` before its declaration.
 
-```
+```forth
 : foo bar ;
 : bar 42 . ;
 
@@ -81,7 +87,7 @@ foo
 
 But be careful not to get an undefined word:
 
-```
+```forth
 : foo a_not_defined_word ;
 
 foo ( error! )
@@ -89,7 +95,7 @@ foo ( error! )
 
 ### Variable
 
-```
+```forth
 : variable create 1 allot ;
 variable var
 42 var !

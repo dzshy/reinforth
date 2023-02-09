@@ -66,6 +66,7 @@ enum opcode {
     OP_COMMA,
     OP_HERE,
     OP_CR,
+    OP_PRINT,
     OP_NOP,
 };
 
@@ -116,6 +117,7 @@ void op_resize(struct forthvm *vm);
 void op_free(struct forthvm *vm);
 void op_bang(struct forthvm *vm);
 void op_at(struct forthvm *vm);
+void op_print(struct forthvm *vm);
 void op_nop(struct forthvm *vm);
 
 char *get_opname(enum opcode);

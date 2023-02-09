@@ -1,6 +1,3 @@
-""
-print
-?println
 emit
 ?cr
 exit

@@ -20,6 +20,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+#include "str.h"
 #include "syntax.h"
 
 char peek_char(FILE *fp)
@@ -73,6 +74,51 @@ data parse_number(FILE *fp, char *buf)
     return num;
 }
 
+static void escape(FILE *fp, StrBuilder *sb)
+{
+    char c = fgetc(fp);
+    switch (c) {
+    case 't':
+        sb_appendc(sb, '\t');
+        break;
+    case 'n':
+        sb_appendc(sb, '\n');
+        break;
+    case '\\':
+        sb_appendc(sb, '\\');
+        break;
+    case '"':
+        sb_appendc(sb, '"');
+        break;
+    default:
+        sb_appendc(sb, '\\');
+        sb_appendc(sb, c);
+    }
+}
+
+char *parse_string(FILE *fp)
+{
+    fgetc(fp);
+    char c = fgetc(fp);
+    StrBuilder sb;
+    sb_init(&sb);
+    while (1) {
+        switch (c) {
+        case EOF:
+            return NULL;
+        case '\\':
+            escape(fp, &sb);
+            break;
+        case '"':
+            sb_appendc(&sb, '\0');
+            return sb.buf;
+        default:
+            sb_appendc(&sb, c);
+        }
+        c = fgetc(fp);
+    }
+}
+
 struct token get_token(FILE *fp, char *buf)
 {
     struct token tok = {TOK_INVALID, 0};
@@ -93,6 +139,13 @@ struct token get_token(FILE *fp, char *buf)
             return tok;
         } else if (c == '(') {
             skipcomment(fp);
+        } else if (c == '"') {
+            char *s = parse_string(fp);
+            if (s == NULL)
+                continue;
+            tok.type = TOK_NUM;
+            tok.dat = (data)s;
+            return tok;
         } else {
             parse_word(fp, buf);
             int syn_num = get_syntax(buf);
