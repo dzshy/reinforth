@@ -1,7 +1,6 @@
 emit
-?cr
-exit
-?assert
+quit
+assert
 dump
 dumpr
 
@@ -25,6 +24,6 @@ r>
 >r
 r@
 rpick
-?i
-?j
+i
+j
 
