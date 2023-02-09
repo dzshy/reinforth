@@ -32,6 +32,7 @@
     }
 
 char *op_vec[OP_NOP + 1] = {
+    [OP_COMMA] = ",",       [OP_HERE] = "here",     [OP_CR] = "cr",
     [OP_ADD] = "+",         [OP_MINUS] = "-",       [OP_MUL] = "*",
     [OP_DIV] = "/",         [OP_MOD] = "mod",       [OP_DIVMOD] = "/mod",
     [OP_MIN] = "min",       [OP_MAX] = "max",       [OP_NEGATE] = "negate",
@@ -50,27 +51,51 @@ char *op_vec[OP_NOP + 1] = {
 };
 
 opfunc op_funcvec[OP_NOP + 1] = {
-    [OP_ADD] = op_add,       [OP_MINUS] = op_minus,
-    [OP_MUL] = op_mul,       [OP_DIV] = op_div,
-    [OP_MOD] = op_mod,       [OP_DIVMOD] = op_divmod,
-    [OP_MIN] = op_min,       [OP_MAX] = op_max,
-    [OP_NEGATE] = op_negate, [OP_EQ] = op_eq,
-    [OP_NEQ] = op_neq,       [OP_GT] = op_gt,
-    [OP_LT] = op_lt,         [OP_GE] = op_ge,
-    [OP_LE] = op_le,         [OP_AND] = op_and,
-    [OP_OR] = op_or,         [OP_NOT] = op_not,
-    [OP_BITAND] = op_bitand, [OP_BITOR] = op_bitor,
-    [OP_INVERT] = op_invert, [OP_XOR] = op_xor,
-    [OP_DUP] = op_dup,       [OP_OVER] = op_over,
-    [OP_SWAP] = op_swap,     [OP_DROP] = op_drop,
-    [OP_DOT] = op_dot,       [OP_CALL] = op_call,
-    [OP_PUSH] = op_push,     [OP_CREATE] = op_create,
-    [OP_BYE] = op_bye,       [OP_EXIT] = op_exit,
-    [OP_JMP] = op_jmp,       [OP_JZ] = op_jz,
-    [OP_CELLS] = op_cells,   [OP_CHARS] = op_chars,
-    [OP_ALLOT] = op_allot,   [OP_ALLOCATE] = op_allocate,
-    [OP_RESIZE] = op_resize, [OP_FREE] = op_free,
-    [OP_BANG] = op_bang,     [OP_AT] = op_at,
+    [OP_COMMA] = op_comma,
+    [OP_HERE] = op_here,
+    [OP_CR] = op_cr,
+    [OP_ADD] = op_add,
+    [OP_MINUS] = op_minus,
+    [OP_MUL] = op_mul,
+    [OP_DIV] = op_div,
+    [OP_MOD] = op_mod,
+    [OP_DIVMOD] = op_divmod,
+    [OP_MIN] = op_min,
+    [OP_MAX] = op_max,
+    [OP_NEGATE] = op_negate,
+    [OP_EQ] = op_eq,
+    [OP_NEQ] = op_neq,
+    [OP_GT] = op_gt,
+    [OP_LT] = op_lt,
+    [OP_GE] = op_ge,
+    [OP_LE] = op_le,
+    [OP_AND] = op_and,
+    [OP_OR] = op_or,
+    [OP_NOT] = op_not,
+    [OP_BITAND] = op_bitand,
+    [OP_BITOR] = op_bitor,
+    [OP_INVERT] = op_invert,
+    [OP_XOR] = op_xor,
+    [OP_DUP] = op_dup,
+    [OP_OVER] = op_over,
+    [OP_SWAP] = op_swap,
+    [OP_DROP] = op_drop,
+    [OP_DOT] = op_dot,
+    [OP_CALL] = op_call,
+    [OP_PUSH] = op_push,
+    [OP_CREATE] = op_create,
+    [OP_BYE] = op_bye,
+    [OP_EXIT] = op_exit,
+    [OP_JMP] = op_jmp,
+    [OP_JZ] = op_jz,
+    [OP_CELLS] = op_cells,
+    [OP_CHARS] = op_chars,
+    [OP_ALLOT] = op_allot,
+    [OP_ALLOCATE] = op_allocate,
+    [OP_RESIZE] = op_resize,
+    [OP_FREE] = op_free,
+    [OP_BANG] = op_bang,
+    [OP_AT] = op_at,
     [OP_NOP] = op_nop,
 };
 
@@ -83,6 +108,24 @@ data get_opaddr(enum opcode op)
     opfunc f = op_funcvec[(int)op];
     return *(data *)&f;
 }
+
+void op_comma(struct forthvm *vm)
+{
+    vm_heap_grow(vm, sizeof(data));
+    CHECKERR;
+    data *p = vm->heaptop - sizeof(data);
+    data a = vm_pop_ds(vm);
+    CHECKERR;
+    *p = a;
+}
+
+void op_here(struct forthvm *vm)
+{
+    data a = (data)vm->heaptop;
+    vm_push_ds(vm, a);
+}
+
+void op_cr(struct forthvm *vm) { fprintf(vm->out, "\n"); }
 
 void op_add(struct forthvm *vm)
 {

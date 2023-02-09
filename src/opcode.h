@@ -63,11 +63,17 @@ enum opcode {
     OP_FREE,
     OP_BANG,
     OP_AT,
+    OP_COMMA,
+    OP_HERE,
+    OP_CR,
     OP_NOP,
 };
 
 struct forthvm;
 
+void op_cr(struct forthvm *vm);
+void op_comma(struct forthvm *vm);
+void op_here(struct forthvm *vm);
 void op_add(struct forthvm *vm);
 void op_minus(struct forthvm *vm);
 void op_mul(struct forthvm *vm);
