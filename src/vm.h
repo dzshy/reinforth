@@ -23,10 +23,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "data_types.h"
 #include "htable.h"
 #include "opcode.h"
 #include "syntax.h"
+#include "types.h"
 
 struct forthvm {
     data *ds;

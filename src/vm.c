@@ -77,7 +77,7 @@ static data find_word(struct forthvm *vm, char *word)
 
 data vm_pop_ds(struct forthvm *vm)
 {
-    if (unlikely(vm->dsp <= 0)) {
+    if (vm->dsp <= 0) {
         vm->errmsg = "pop from data stack failed";
         vm->finished = true;
         vm->ret = -1;
@@ -97,7 +97,7 @@ void vm_push_ds(struct forthvm *vm, data d)
 
 data vm_pop_rs(struct forthvm *vm)
 {
-    if (unlikely(vm->rsp <= 0)) {
+    if (vm->rsp <= 0) {
         vm->errmsg = "pop from return stack failed";
         vm->finished = true;
         vm->ret = -1;
@@ -170,7 +170,7 @@ data vm_execute(struct forthvm *vm)
     enum opcode op;
 
     while (!vm->finished) {
-        if (unlikely(vm->pc >= vm->codesz)) {
+        if (vm->pc >= vm->codesz) {
             break;
         }
         data op_addr = vm->code[vm->pc];

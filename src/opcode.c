@@ -20,34 +20,58 @@
 #include "vm.h"
 
 #define CHECKERR                                                               \
-    if (unlikely(vm->finished))                                                \
+    if (vm->finished)                                                          \
         return;
 
 #define CHECKDS(len)                                                           \
-    if (unlikely(vm->dsp < len)) {                                             \
+    if (vm->dsp < len) {                                                       \
         vm->ret = -1;                                                          \
         vm->finished = true;                                                   \
         vm->errmsg = "no enough element on data stack";                        \
         return;                                                                \
     }
 
-char *op_vec[] = {
-    "+",      "-",    "*",      "/",     "mod",    "/mod",     "min",    "max",
-    "negate", "=",    "<>",     ">",     "<",      ">=",       "<=",     "and",
-    "or",     "not",  "bitand", "bitor", "invert", "xor",      "dup",    "over",
-    "swap",   "drop", ".",      "call",  "push",   "create",   "bye",    "ret",
-    "jmp",    "jz",   "cells",  "chars", "allot",  "allocate", "resize", "free",
-    "!",      "@",    "nop"};
+char *op_vec[OP_NOP + 1] = {
+    [OP_ADD] = "+",         [OP_MINUS] = "-",       [OP_MUL] = "*",
+    [OP_DIV] = "/",         [OP_MOD] = "mod",       [OP_DIVMOD] = "/mod",
+    [OP_MIN] = "min",       [OP_MAX] = "max",       [OP_NEGATE] = "negate",
+    [OP_EQ] = "=",          [OP_NEQ] = "<>",        [OP_GT] = ">",
+    [OP_LT] = "<",          [OP_GE] = ">=",         [OP_LE] = "<=",
+    [OP_AND] = "and",       [OP_OR] = "or",         [OP_OR] = "or",
+    [OP_NOT] = "not",       [OP_BITAND] = "bitand", [OP_BITOR] = "bitor",
+    [OP_INVERT] = "invert", [OP_XOR] = "xor",       [OP_DUP] = "dup",
+    [OP_OVER] = "over",     [OP_SWAP] = "swap",     [OP_DROP] = "drop",
+    [OP_DOT] = ".",         [OP_CALL] = "call\t",   [OP_PUSH] = "push\t",
+    [OP_CREATE] = "create", [OP_BYE] = "bye",       [OP_EXIT] = "exit",
+    [OP_JMP] = "jmp\t",     [OP_JZ] = "jz\t",       [OP_CELLS] = "cells",
+    [OP_CHARS] = "chars",   [OP_ALLOT] = "allot",   [OP_ALLOCATE] = "allocate",
+    [OP_RESIZE] = "resize", [OP_FREE] = "free",     [OP_BANG] = "!",
+    [OP_AT] = "@",          [OP_NOP] = "nop\t",
+};
 
-opfunc op_funcvec[] = {
-    op_add,    op_minus,    op_mul,    op_div,  op_mod,   op_divmod,
-    op_min,    op_max,      op_negate, op_eq,   op_neq,   op_gt,
-    op_lt,     op_ge,       op_le,     op_and,  op_or,    op_not,
-    op_bitand, op_bitor,    op_invert, op_xor,  op_dup,   op_over,
-    op_swap,   op_drop,     op_dot,    op_call, op_push,  op_create,
-    op_bye,    op_ret,      op_jmp,    op_jz,   op_cells, op_chars,
-    op_allot,  op_allocate, op_resize, op_free, op_bang,  op_at,
-    op_nop,
+opfunc op_funcvec[OP_NOP + 1] = {
+    [OP_ADD] = op_add,       [OP_MINUS] = op_minus,
+    [OP_MUL] = op_mul,       [OP_DIV] = op_div,
+    [OP_MOD] = op_mod,       [OP_DIVMOD] = op_divmod,
+    [OP_MIN] = op_min,       [OP_MAX] = op_max,
+    [OP_NEGATE] = op_negate, [OP_EQ] = op_eq,
+    [OP_NEQ] = op_neq,       [OP_GT] = op_gt,
+    [OP_LT] = op_lt,         [OP_GE] = op_ge,
+    [OP_LE] = op_le,         [OP_AND] = op_and,
+    [OP_OR] = op_or,         [OP_NOT] = op_not,
+    [OP_BITAND] = op_bitand, [OP_BITOR] = op_bitor,
+    [OP_INVERT] = op_invert, [OP_XOR] = op_xor,
+    [OP_DUP] = op_dup,       [OP_OVER] = op_over,
+    [OP_SWAP] = op_swap,     [OP_DROP] = op_drop,
+    [OP_DOT] = op_dot,       [OP_CALL] = op_call,
+    [OP_PUSH] = op_push,     [OP_CREATE] = op_create,
+    [OP_BYE] = op_bye,       [OP_EXIT] = op_exit,
+    [OP_JMP] = op_jmp,       [OP_JZ] = op_jz,
+    [OP_CELLS] = op_cells,   [OP_CHARS] = op_chars,
+    [OP_ALLOT] = op_allot,   [OP_ALLOCATE] = op_allocate,
+    [OP_RESIZE] = op_resize, [OP_FREE] = op_free,
+    [OP_BANG] = op_bang,     [OP_AT] = op_at,
+    [OP_NOP] = op_nop,
 };
 
 char *get_opname(enum opcode op) { return op_vec[(int)op]; }
@@ -365,7 +389,7 @@ void op_create(struct forthvm *vm)
     vm->dict[a] = b;
     vm_emit_opcode(vm, OP_PUSH);
     vm_emit_data(vm, (data)vm->heaptop);
-    vm_emit_opcode(vm, OP_RET);
+    vm_emit_opcode(vm, OP_EXIT);
     *jmp_ptr = vm->codesz;
 }
 
@@ -396,7 +420,7 @@ void op_jz(struct forthvm *vm)
         vm->pc = addr - 1;
 }
 
-void op_ret(struct forthvm *vm)
+void op_exit(struct forthvm *vm)
 {
     data addr = vm_pop_rs(vm);
     vm->pc = addr;

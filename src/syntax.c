@@ -22,11 +22,16 @@
 #include "opcode.h"
 #include "vm.h"
 
-char *syntax_name[] = {":", ";", "begin", "until", "if", "else", "then"};
+char *syntax_name[SYN_NOP] = {
+    [SYN_COLON] = ":",     [SYN_SEMI] = ";", [SYN_BEGIN] = "begin",
+    [SYN_UNTIL] = "until", [SYN_IF] = "if",  [SYN_ELSE] = "else",
+    [SYN_THEN] = "then",
+};
 
-opfunc syntax_ops[] = {
-    syn_colon, syn_semi, syn_begin, syn_until,
-    syn_if,    syn_else, syn_then,  syn_nop,
+opfunc syntax_ops[SYN_NOP + 1] = {
+    [SYN_COLON] = syn_colon, [SYN_SEMI] = syn_semi, [SYN_BEGIN] = syn_begin,
+    [SYN_UNTIL] = syn_until, [SYN_IF] = syn_if,     [SYN_ELSE] = syn_else,
+    [SYN_THEN] = syn_then,   [SYN_NOP] = syn_nop,
 };
 
 int get_syntax(char *word)
@@ -74,7 +79,7 @@ void syn_semi(struct forthvm *vm)
         vm->ret = -1;
         return;
     }
-    vm_emit_opcode(vm, OP_RET);
+    vm_emit_opcode(vm, OP_EXIT);
     vm->pc = vm->codesz;
     vm->ready = true;
 }

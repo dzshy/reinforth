@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "data_types.h"
+#include "types.h"
 
 enum token_type {
     TOK_NUM,

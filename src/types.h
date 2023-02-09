@@ -15,8 +15,8 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef REINFORTH_DATA_TYPES_H_
-#define REINFORTH_DATA_TYPES_H_
+#ifndef REINFORTH_TYPES_H_
+#define REINFORTH_TYPES_H_
 
 #include "stdint.h"
 
@@ -30,11 +30,5 @@ struct dbldata {
 };
 
 typedef void (*opfunc)(struct forthvm *);
-// builtin word: d1 = opcode, d2 = opcode
-// user word: d1 = OP_RUN, d2 = code_ptr
-// created var: d1 = OP_PUSH, d2 = heap_ptr
-
-#define likely(x) __builtin_expect((x), 1)
-#define unlikely(x) __builtin_expect((x), 0)
 
 #endif

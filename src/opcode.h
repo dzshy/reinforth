@@ -18,7 +18,7 @@
 #ifndef REINFORTH_OPCODE_H_
 #define REINFORTH_OPCODE_H_
 
-#include "data_types.h"
+#include "types.h"
 
 enum opcode {
     OP_ADD,
@@ -52,7 +52,7 @@ enum opcode {
     OP_PUSH,
     OP_CREATE,
     OP_BYE,
-    OP_RET,
+    OP_EXIT,
     OP_JMP,
     OP_JZ,
     OP_CELLS,
@@ -99,7 +99,7 @@ void op_call(struct forthvm *vm);
 void op_push(struct forthvm *vm);
 void op_create(struct forthvm *vm);
 void op_bye(struct forthvm *vm);
-void op_ret(struct forthvm *vm);
+void op_exit(struct forthvm *vm);
 void op_jmp(struct forthvm *vm);
 void op_jz(struct forthvm *vm);
 void op_cells(struct forthvm *vm);

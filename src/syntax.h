@@ -18,7 +18,7 @@
 #ifndef REINFORTH_SYNTAX_H_
 #define REINFORTH_SYNTAX_H_
 
-#include "data_types.h"
+#include "types.h"
 
 enum syntax {
     SYN_COLON,
