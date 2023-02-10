@@ -1,10 +1,7 @@
-emit
 quit
-assert
 dump
 dumpr
 
-rot
 depth
 pick
 
@@ -26,4 +23,5 @@ r@
 rpick
 i
 j
+tail recursion elimination
 

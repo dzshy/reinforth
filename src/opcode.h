@@ -67,11 +67,17 @@ enum opcode {
     OP_HERE,
     OP_CR,
     OP_PRINT,
+    OP_EMIT,
+    OP_ASSERT,
+    OP_ROT,
     OP_NOP,
 };
 
 struct forthvm;
 
+void op_emit(struct forthvm *vm);
+void op_assert(struct forthvm *vm);
+void op_rot(struct forthvm *vm);
 void op_cr(struct forthvm *vm);
 void op_comma(struct forthvm *vm);
 void op_here(struct forthvm *vm);

@@ -17,6 +17,9 @@
 
 #include "opcode.h"
 
+#include <string.h>
+#include <assert.h>
+
 #include "vm.h"
 
 #define CHECKERR                                                               \
@@ -32,6 +35,9 @@
     }
 
 char *op_vec[OP_NOP + 1] = {
+    [OP_EMIT] = "emit",
+    [OP_ASSERT] = "assert",
+    [OP_ROT] = "rot",
     [OP_PRINT] = "print",
     [OP_COMMA] = ",",
     [OP_HERE] = "here",
@@ -83,6 +89,9 @@ char *op_vec[OP_NOP + 1] = {
 };
 
 opfunc op_funcvec[OP_NOP + 1] = {
+    [OP_ASSERT] = op_assert,
+    [OP_EMIT] = op_emit,
+    [OP_ROT] = op_rot,
     [OP_PRINT] = op_print,   [OP_COMMA] = op_comma,
     [OP_HERE] = op_here,     [OP_CR] = op_cr,
     [OP_ADD] = op_add,       [OP_MINUS] = op_minus,
@@ -117,6 +126,39 @@ data get_opaddr(enum opcode op)
 {
     opfunc f = op_funcvec[(int)op];
     return *(data *)&f;
+}
+
+
+void op_emit(struct forthvm *vm)
+{
+    char c = vm_pop_ds(vm);
+    CHECKERR;
+    fprintf(vm->out, "%c", c);
+}
+
+void op_assert(struct forthvm *vm)
+{
+    CHECKDS(2);
+    char *s = (char *)vm_pop_ds(vm);
+    data a = vm_pop_ds(vm);
+    if (!a) {
+        vm->finished = true;
+        vm->ret = -1;
+        char *errmsg = malloc(strlen(s) + 50);
+        errmsg[0] = '\0';
+        strcat(errmsg, "assertion failed: ");
+        strcat(errmsg, s);
+        vm->errmsg = errmsg;
+    }
+}
+
+void op_rot(struct forthvm *vm)
+{
+    CHECKDS(3);
+    data t = vm->ds[vm->dsp - 2];
+    vm->ds[vm->dsp - 2] = vm->ds[vm->dsp - 1];
+    vm->ds[vm->dsp - 1] = vm->ds[vm->dsp];
+    vm->ds[vm->dsp] = t;
 }
 
 void op_comma(struct forthvm *vm)
