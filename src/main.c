@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 {
     struct forthvm vm;
     int ret;
-
+    char *filename = "stdin";
     FILE *fin = stdin;
     if (argc > 1) {
         fin = fopen(argv[1], "r");
@@ -29,10 +29,13 @@ int main(int argc, char **argv)
             fprintf(stderr, "Failed to open file: %s\n", argv[1]);
             exit(EXIT_FAILURE);
         }
+        filename = argv[1];
     }
     vm_init(&vm, fin, stdout);
     vm_run(&vm);
-    if (vm.ret < 0) {
+    if (vm.ret == -2) {
+        fprintf(stderr, "Assertion failed: %s:%d\n", filename, vm.linenum);
+    } else if (vm.ret < 0){
         fprintf(stderr, "VM error: %s\n", vm.errmsg);
     }
     return vm.ret;

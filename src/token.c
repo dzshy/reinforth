@@ -22,61 +22,60 @@
 
 #include "str.h"
 #include "syntax.h"
+#include "vm.h"
 
-char peek_char(FILE *fp)
+char peek_char(struct forthvm *vm)
 {
-    int c = fgetc(fp);
-    if (c == EOF)
-        return c;
-    ungetc(c, fp);
+    int c = vm_getc(vm);
+    vm_ungetc(vm, c);
     return c;
 }
 
-void skipspace(FILE *fp)
+void skipspace(struct forthvm *vm)
 {
-    char c = peek_char(fp);
+    char c = peek_char(vm);
     while (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
-        fgetc(fp);
-        c = peek_char(fp);
+        vm_getc(vm);
+        c = peek_char(vm);
     }
 }
 
-void skipcomment(FILE *fp)
+void skipcomment(struct forthvm *vm)
 {
-    char c = peek_char(fp);
+    char c = peek_char(vm);
     while (c != ')') {
-        fgetc(fp);
-        c = peek_char(fp);
+        vm_getc(vm);
+        c = peek_char(vm);
     }
-    fgetc(fp);
+    vm_getc(vm);
 }
 
-void parse_word(FILE *fp, char *buf)
+void parse_word(struct forthvm *vm)
 {
     int len = 0;
-    char c = peek_char(fp);
+    char c = peek_char(vm);
     while (!isspace(c) && c != EOF && c != '(') {
         if (len < 1023) {
-            buf[len] = c;
+            vm->curword[len] = c;
             len++;
         }
-        fgetc(fp);
-        c = peek_char(fp);
+        vm_getc(vm);
+        c = peek_char(vm);
     }
-    buf[len] = '\0';
+    vm->curword[len] = '\0';
 }
 
-data parse_number(FILE *fp, char *buf)
+data parse_number(struct forthvm *vm)
 {
-    parse_word(fp, buf);
+    parse_word(vm);
     char *endp;
-    long num = strtol(buf, &endp, 10);
+    long num = strtol(vm->curword, &endp, 10);
     return num;
 }
 
-static void escape(FILE *fp, StrBuilder *sb)
+static void escape(struct forthvm *vm, StrBuilder *sb)
 {
-    char c = fgetc(fp);
+    char c = vm_getc(vm);
     switch (c) {
     case 't':
         sb_appendc(sb, '\t');
@@ -96,10 +95,10 @@ static void escape(FILE *fp, StrBuilder *sb)
     }
 }
 
-char *parse_string(FILE *fp)
+char *parse_string(struct forthvm *vm)
 {
-    fgetc(fp);
-    char c = fgetc(fp);
+    vm_getc(vm);
+    char c = vm_getc(vm);
     StrBuilder sb;
     sb_init(&sb);
     while (1) {
@@ -107,7 +106,7 @@ char *parse_string(FILE *fp)
         case EOF:
             return NULL;
         case '\\':
-            escape(fp, &sb);
+            escape(vm, &sb);
             break;
         case '"':
             sb_appendc(&sb, '\0');
@@ -115,40 +114,38 @@ char *parse_string(FILE *fp)
         default:
             sb_appendc(&sb, c);
         }
-        c = fgetc(fp);
+        c = vm_getc(vm);
     }
 }
 
-struct token get_token(FILE *fp, char *buf)
+struct token get_token(struct forthvm *vm)
 {
     struct token tok = {TOK_INVALID, 0};
     while (1) {
-        skipspace(fp);
-        char c = fgetc(fp);
-        char c1 = fgetc(fp);
-        if (c1 != EOF)
-            ungetc(c1, fp);
-        if (c != EOF)
-            ungetc(c, fp);
+        skipspace(vm);
+        char c = vm_getc(vm);
+        char c1 = vm_getc(vm);
+        vm_ungetc(vm, c1);
+        vm_ungetc(vm, c);
         if (c >= '0' && c <= '9' || c == '-' && !isspace(c1)) {
             tok.type = TOK_NUM;
-            tok.dat = parse_number(fp, buf);
+            tok.dat = parse_number(vm);
             return tok;
         } else if (c == EOF) {
             tok.type = TOK_EOF;
             return tok;
         } else if (c == '(') {
-            skipcomment(fp);
+            skipcomment(vm);
         } else if (c == '"') {
-            char *s = parse_string(fp);
+            char *s = parse_string(vm);
             if (s == NULL)
                 continue;
             tok.type = TOK_NUM;
             tok.dat = (data)s;
             return tok;
         } else {
-            parse_word(fp, buf);
-            int syn_num = get_syntax(buf);
+            parse_word(vm);
+            int syn_num = get_syntax(vm->curword);
             if (syn_num >= 0) {
                 tok.type = TOK_SYNTAX;
                 tok.dat = syn_num;

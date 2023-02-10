@@ -246,17 +246,11 @@ void op_emit(struct forthvm *vm)
 
 void op_assert(struct forthvm *vm)
 {
-    CHECKDS(2);
-    char *s = (char *)vm_pop_ds(vm);
     data a = vm_pop_ds(vm);
+    CHECKERR;
     if (!a) {
         vm->finished = true;
-        vm->ret = -1;
-        char *errmsg = malloc(strlen(s) + 50);
-        errmsg[0] = '\0';
-        strcat(errmsg, "assertion failed: ");
-        strcat(errmsg, s);
-        vm->errmsg = errmsg;
+        vm->ret = -2;
     }
 }
 
@@ -593,14 +587,14 @@ void op_create(struct forthvm *vm)
 {
     vm_emit_opcode(vm, OP_JMP);
     vm_emit_data(vm, 0);
-    data *jmp_ptr = &vm->code[vm->codesz - 1];
+    data jmp_ptr = vm->codesz;
     data a = vm_read_word(vm);
     data b = vm->codesz;
     vm->dict[a] = b;
     vm_emit_opcode(vm, OP_PUSH);
     vm_emit_data(vm, (data)vm->heaptop);
     vm_emit_opcode(vm, OP_EXIT);
-    *jmp_ptr = vm->codesz;
+    vm->code[jmp_ptr] = vm->codesz;
 }
 
 void op_jmp(struct forthvm *vm)

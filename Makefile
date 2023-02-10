@@ -16,13 +16,8 @@ all: $(TARGET)
 $(TARGET): $(obj) src/main.c
 	$(CC) $(LDFLAGS) -o $@ $(obj) src/main.c
  
-# test: $(tests_bin)
-# 	@echo
-# 	@echo "Run tests:"
-# 	@scripts/runall.sh $^
-
-# $(tests_bin):%.bin:%.c $(obj)
-# 	$(CC) $(CFLAGS) $(LDFLAGS) $< $(obj) -MD -MF $@.d -o $@
+test: $(TARGET)
+	scripts/runtests.sh $(shell find tests/ -name '*.fth')
 
 $(obj):%.o:%.c
 	$(CC) -c $(CFLAGS) $< -MD -MF $@.d -o $@

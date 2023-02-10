@@ -35,6 +35,8 @@ struct token {
     data dat;
 };
 
-struct token get_token(FILE *fp, char *buf);
+struct forthvm;
+
+struct token get_token(struct forthvm *vm);
 
 #endif

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 for var in "$@"; do
-    ./$var
+    ./reinforth $var
     if [ $? -ne 0 ]; then
         exit 255
     fi

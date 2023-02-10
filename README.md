@@ -1,82 +1,29 @@
 # reinforth
 
-**!!! WORK IN PROGRESS !!!**
-
 A small implementation of Forth for fun.
 
-## Build
-
-Debug version:
+Build debug version:
 
 ```
 make
 ```
 
-Release version:
+Build release version:
 
 ```
 RELEASE=1 make
 ```
 
-## Examples
+Run tests:
 
-### Hello, World
-
-```forth
-"hello, world" print cr
+```
+make test
 ```
 
-### Recursion
+Format code:
 
-```forth
-: fibo ( recursive fibonacci )
-    dup 2 < if
-        1 swap drop
-    else
-        dup 1 - fibo over 2 - fibo + swap drop
-    then
-;
-
-32 fibo .
+```
+make fmt
 ```
 
-```forth
-( mutual recurtion )
-: is_even
-    dup 0 = if
-        drop 1
-    else
-        1 - is_odd
-    then
-;
-
-: is_odd
-    dup 0 = if
-        drop 0
-    else
-        1 - is_even
-    then
-;
-
-15 is_odd  .
-15 is_even .
-20 is_odd  .
-20 is_even .
-```
-
-```forth
-( stackoverflow )
-: count 1 + dup . count ;
-
-0 count
-```
-
-### Variable
-
-```forth
-: variable create 1 allot ;
-variable var
-42 var !
-var @ .
-```
-
+See `examples/` and `tests/` for details of this interpreter.

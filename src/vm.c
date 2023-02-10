@@ -144,6 +144,7 @@ void vm_init(struct forthvm *vm, FILE *fin, FILE *fout)
     vm->heapcap = 4096;
     vm->dictcap = 1024;
     vm->codecap = 1024;
+    vm->linenum = 1;
 
     vm->curword = malloc(1024);
     vm->wordtable = malloc(sizeof(HTable));
@@ -187,7 +188,7 @@ static int compile(struct forthvm *vm)
     opfunc fn;
     data entry;
     while (!vm->finished) {
-        tok = get_token(vm->in, vm->curword);
+        tok = get_token(vm);
         switch (tok.type) {
         case TOK_NUM:
             vm_emit_opcode(vm, OP_PUSH);
@@ -233,7 +234,7 @@ void vm_heap_grow(struct forthvm *vm, data size)
 data vm_read_word(struct forthvm *vm)
 {
     struct token tok;
-    tok = get_token(vm->in, vm->curword);
+    tok = get_token(vm);
     if (tok.type != TOK_WORD) {
         vm->finished = true;
         vm->ret = -1;
@@ -241,6 +242,18 @@ data vm_read_word(struct forthvm *vm)
         return -1;
     }
     return find_word(vm, vm->curword);
+}
+
+char vm_getc(struct forthvm *vm) {
+    char c = fgetc(vm->in); 
+    if (c == '\n') vm->linenum++;
+    return c;
+}
+
+void vm_ungetc(struct forthvm *vm, char c) {
+    if (c == EOF) return;
+    if (c == '\n') vm->linenum--;
+    ungetc(c, vm->in);
 }
 
 void vm_run(struct forthvm *vm)
