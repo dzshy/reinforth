@@ -35,6 +35,9 @@
     }
 
 char *op_vec[OP_NOP + 1] = {
+    [OP_DUMP] = "dump",
+    [OP_RDUMP] = "rdump",
+    [OP_DEPTH] = "depth",
     [OP_EMIT] = "emit",
     [OP_ASSERT] = "assert",
     [OP_ROT] = "rot",
@@ -89,6 +92,9 @@ char *op_vec[OP_NOP + 1] = {
 };
 
 opfunc op_funcvec[OP_NOP + 1] = {
+    [OP_DUMP] = op_dump,
+    [OP_RDUMP] = op_rdump,
+    [OP_DEPTH] = op_depth,
     [OP_ASSERT] = op_assert,
     [OP_EMIT] = op_emit,
     [OP_ROT] = op_rot,
@@ -128,6 +134,31 @@ data get_opaddr(enum opcode op)
     return *(data *)&f;
 }
 
+void op_dump(struct forthvm *vm)
+{
+    data depth = vm->dsp;
+    fprintf(vm->out, "<%lld> ", depth);
+    for (int i = 1; i <= depth; i++) {
+        fprintf(vm->out, "%ld ", vm->ds[i]);
+    }
+    fprintf(vm->out, "<top>");
+}
+
+void op_rdump(struct forthvm *vm)
+{
+    data depth = vm->rsp;
+    fprintf(vm->out, "[%lld] ", depth);
+    for (int i = 1; i <= depth; i++) {
+        fprintf(vm->out, "%ld ", vm->rs[i]);
+    }
+    fprintf(vm->out, "[top]");
+}
+
+void op_depth(struct forthvm *vm)
+{
+    data depth = vm->dsp;
+    vm_push_ds(vm, depth);
+}
 
 void op_emit(struct forthvm *vm)
 {

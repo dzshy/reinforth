@@ -1,9 +1,11 @@
-quit
-dump
-dumpr
-
-depth
 pick
+rpick
+r>
+>r
+r@
+execute
+'
+cfunc
 
 do
 loop
@@ -12,16 +14,8 @@ while
 repeat
 leave
 again
-
-execute
-'
-cfunc
-
-r>
->r
-r@
-rpick
 i
 j
+
 tail recursion elimination
 

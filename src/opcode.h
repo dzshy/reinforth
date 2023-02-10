@@ -70,11 +70,17 @@ enum opcode {
     OP_EMIT,
     OP_ASSERT,
     OP_ROT,
+    OP_DUMP,
+    OP_RDUMP,
+    OP_DEPTH,
     OP_NOP,
 };
 
 struct forthvm;
 
+void op_dump(struct forthvm *vm);
+void op_rdump(struct forthvm *vm);
+void op_depth(struct forthvm *vm);
 void op_emit(struct forthvm *vm);
 void op_assert(struct forthvm *vm);
 void op_rot(struct forthvm *vm);
