@@ -6,5 +6,7 @@
     then
 ;
 
-32 fibo .
+32 fibo
+3524578 = assert
 
+depth 0 = assert

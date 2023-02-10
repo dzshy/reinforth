@@ -17,6 +17,7 @@ RELEASE=1 make
 Run tests:
 
 ```
+echo '"hello, world" print cr' | ./reinforth
 make test
 ```
 
@@ -26,4 +27,3 @@ Format code:
 make fmt
 ```
 
-See `examples/` and `tests/` for details of this interpreter.

@@ -14,8 +14,17 @@
     then
 ;
 
-15 is_odd  .
-15 is_even .
-20 is_odd  .
-20 is_even .
+15 is_odd 
+assert
+
+15 is_even
+not assert
+
+20 is_odd
+not assert
+
+20 is_even
+assert
+
+depth 0 = assert
 

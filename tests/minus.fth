@@ -9,3 +9,5 @@
 
 -2 -3 -
 1 = assert
+
+depth 0 = assert

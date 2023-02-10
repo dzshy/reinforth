@@ -587,14 +587,14 @@ void op_create(struct forthvm *vm)
 {
     vm_emit_opcode(vm, OP_JMP);
     vm_emit_data(vm, 0);
-    data jmp_ptr = vm->codesz;
+    data addr_ptr = vm->codesz - 1;
     data a = vm_read_word(vm);
     data b = vm->codesz;
     vm->dict[a] = b;
     vm_emit_opcode(vm, OP_PUSH);
     vm_emit_data(vm, (data)vm->heaptop);
     vm_emit_opcode(vm, OP_EXIT);
-    vm->code[jmp_ptr] = vm->codesz;
+    vm->code[addr_ptr] = vm->codesz;
 }
 
 void op_jmp(struct forthvm *vm)
