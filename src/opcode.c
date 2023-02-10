@@ -17,8 +17,8 @@
 
 #include "opcode.h"
 
-#include <string.h>
 #include <assert.h>
+#include <string.h>
 
 #include "vm.h"
 
@@ -31,6 +31,14 @@
         vm->ret = -1;                                                          \
         vm->finished = true;                                                   \
         vm->errmsg = "no enough element on data stack";                        \
+        return;                                                                \
+    }
+
+#define CHECKRS(len)                                                           \
+    if (vm->rsp < len) {                                                       \
+        vm->ret = -1;                                                          \
+        vm->finished = true;                                                   \
+        vm->errmsg = "no enough element on return stack";                      \
         return;                                                                \
     }
 
@@ -89,38 +97,71 @@ char *op_vec[OP_NOP + 1] = {
     [OP_BANG] = "!",
     [OP_AT] = "@",
     [OP_NOP] = "nop\t",
+    [OP_PICK] = "pick",
+    [OP_RPICK] = "rpick",
+    [OP_R2D] = "r>",
+    [OP_D2R] = ">r",
+    [OP_RAT] = "r@",
 };
 
 opfunc op_funcvec[OP_NOP + 1] = {
+    [OP_PICK] = op_pick,
+    [OP_RPICK] = op_rpick,
+    [OP_R2D] = op_r2d,
+    [OP_D2R] = op_d2r,
+    [OP_RAT] = op_rat,
     [OP_DUMP] = op_dump,
     [OP_RDUMP] = op_rdump,
     [OP_DEPTH] = op_depth,
     [OP_ASSERT] = op_assert,
     [OP_EMIT] = op_emit,
     [OP_ROT] = op_rot,
-    [OP_PRINT] = op_print,   [OP_COMMA] = op_comma,
-    [OP_HERE] = op_here,     [OP_CR] = op_cr,
-    [OP_ADD] = op_add,       [OP_MINUS] = op_minus,
-    [OP_MUL] = op_mul,       [OP_DIV] = op_div,
-    [OP_MOD] = op_mod,       [OP_DIVMOD] = op_divmod,
-    [OP_MIN] = op_min,       [OP_MAX] = op_max,
-    [OP_NEGATE] = op_negate, [OP_EQ] = op_eq,
-    [OP_NEQ] = op_neq,       [OP_GT] = op_gt,
-    [OP_LT] = op_lt,         [OP_GE] = op_ge,
-    [OP_LE] = op_le,         [OP_AND] = op_and,
-    [OP_OR] = op_or,         [OP_NOT] = op_not,
-    [OP_BITAND] = op_bitand, [OP_BITOR] = op_bitor,
-    [OP_INVERT] = op_invert, [OP_XOR] = op_xor,
-    [OP_DUP] = op_dup,       [OP_OVER] = op_over,
-    [OP_SWAP] = op_swap,     [OP_DROP] = op_drop,
-    [OP_DOT] = op_dot,       [OP_CALL] = op_call,
-    [OP_PUSH] = op_push,     [OP_CREATE] = op_create,
-    [OP_BYE] = op_bye,       [OP_EXIT] = op_exit,
-    [OP_JMP] = op_jmp,       [OP_JZ] = op_jz,
-    [OP_CELLS] = op_cells,   [OP_CHARS] = op_chars,
-    [OP_ALLOT] = op_allot,   [OP_ALLOCATE] = op_allocate,
-    [OP_RESIZE] = op_resize, [OP_FREE] = op_free,
-    [OP_BANG] = op_bang,     [OP_AT] = op_at,
+    [OP_PRINT] = op_print,
+    [OP_COMMA] = op_comma,
+    [OP_HERE] = op_here,
+    [OP_CR] = op_cr,
+    [OP_ADD] = op_add,
+    [OP_MINUS] = op_minus,
+    [OP_MUL] = op_mul,
+    [OP_DIV] = op_div,
+    [OP_MOD] = op_mod,
+    [OP_DIVMOD] = op_divmod,
+    [OP_MIN] = op_min,
+    [OP_MAX] = op_max,
+    [OP_NEGATE] = op_negate,
+    [OP_EQ] = op_eq,
+    [OP_NEQ] = op_neq,
+    [OP_GT] = op_gt,
+    [OP_LT] = op_lt,
+    [OP_GE] = op_ge,
+    [OP_LE] = op_le,
+    [OP_AND] = op_and,
+    [OP_OR] = op_or,
+    [OP_NOT] = op_not,
+    [OP_BITAND] = op_bitand,
+    [OP_BITOR] = op_bitor,
+    [OP_INVERT] = op_invert,
+    [OP_XOR] = op_xor,
+    [OP_DUP] = op_dup,
+    [OP_OVER] = op_over,
+    [OP_SWAP] = op_swap,
+    [OP_DROP] = op_drop,
+    [OP_DOT] = op_dot,
+    [OP_CALL] = op_call,
+    [OP_PUSH] = op_push,
+    [OP_CREATE] = op_create,
+    [OP_BYE] = op_bye,
+    [OP_EXIT] = op_exit,
+    [OP_JMP] = op_jmp,
+    [OP_JZ] = op_jz,
+    [OP_CELLS] = op_cells,
+    [OP_CHARS] = op_chars,
+    [OP_ALLOT] = op_allot,
+    [OP_ALLOCATE] = op_allocate,
+    [OP_RESIZE] = op_resize,
+    [OP_FREE] = op_free,
+    [OP_BANG] = op_bang,
+    [OP_AT] = op_at,
     [OP_NOP] = op_nop,
 };
 
@@ -132,6 +173,42 @@ data get_opaddr(enum opcode op)
 {
     opfunc f = op_funcvec[(int)op];
     return *(data *)&f;
+}
+
+void op_pick(struct forthvm *vm)
+{
+    data a = vm_pop_ds(vm);
+    CHECKERR;
+    CHECKDS(a);
+    vm_push_ds(vm, vm->ds[vm->dsp - a]);
+}
+
+void op_rpick(struct forthvm *vm)
+{
+    data a = vm_pop_ds(vm);
+    CHECKERR;
+    CHECKRS(a);
+    vm_push_ds(vm, vm->rs[vm->rsp - a]);
+}
+
+void op_d2r(struct forthvm *vm)
+{
+    data a = vm_pop_ds(vm);
+    CHECKERR;
+    vm_push_rs(vm, a);
+}
+
+void op_r2d(struct forthvm *vm)
+{
+    data a = vm_pop_rs(vm);
+    CHECKERR;
+    vm_push_ds(vm, a);
+}
+
+void op_rat(struct forthvm *vm)
+{
+    CHECKRS(1);
+    vm_push_ds(vm, vm->rs[vm->rsp]);
 }
 
 void op_dump(struct forthvm *vm)

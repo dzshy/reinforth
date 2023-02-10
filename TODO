@@ -1,21 +1,13 @@
-pick
-rpick
-r>
->r
-r@
 execute
 '
 cfunc
 
-do
-loop
-+loop
-while
-repeat
-leave
-again
+do ... leave ... loop
+do ... leave ... +loop
 i
 j
 
-tail recursion elimination
+begin ... while ... repeat
+begin ... until
+begin ... again ( infinite )
 

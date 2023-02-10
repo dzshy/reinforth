@@ -73,11 +73,21 @@ enum opcode {
     OP_DUMP,
     OP_RDUMP,
     OP_DEPTH,
+    OP_PICK,
+    OP_RPICK,
+    OP_D2R,
+    OP_R2D,
+    OP_RAT,
     OP_NOP,
 };
 
 struct forthvm;
 
+void op_pick(struct forthvm *vm);
+void op_rpick(struct forthvm *vm);
+void op_r2d(struct forthvm *vm);
+void op_d2r(struct forthvm *vm);
+void op_rat(struct forthvm *vm);
 void op_dump(struct forthvm *vm);
 void op_rdump(struct forthvm *vm);
 void op_depth(struct forthvm *vm);
