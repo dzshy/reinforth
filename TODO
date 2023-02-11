@@ -1,9 +1,3 @@
-i
-i'
-j
-do ... leave ... loop
-do ... leave ... +loop
-
 begin ... while ... repeat
 begin ... until
 begin ... again ( infinite )

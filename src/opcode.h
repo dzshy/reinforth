@@ -81,11 +81,23 @@ enum opcode {
     OP_EXECUTE,
     OP_QUOTE,
     OP_CFUNC,
+    OP_DO,
+    OP_LOOP,
+    OP_PLUSLOOP,
+    OP_I,
+    OP_II,
+    OP_J,
     OP_NOP,
 };
 
 struct forthvm;
 
+void op_i(struct forthvm *vm);
+void op_ii(struct forthvm *vm);
+void op_j(struct forthvm *vm);
+void op_do(struct forthvm *vm);
+void op_loop(struct forthvm *vm);
+void op_plusloop(struct forthvm *vm);
 void op_execute(struct forthvm *vm);
 void op_quote(struct forthvm *vm);
 void op_cfunc(struct forthvm *vm);

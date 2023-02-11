@@ -28,6 +28,10 @@ enum syntax {
     SYN_IF,
     SYN_ELSE,
     SYN_THEN,
+    SYN_DO,
+    SYN_LEAVE,
+    SYN_LOOP,
+    SYN_PLUSLOOP,
     SYN_NOP,
 };
 
@@ -41,6 +45,10 @@ void syn_until(struct forthvm *vm);
 void syn_if(struct forthvm *vm);
 void syn_else(struct forthvm *vm);
 void syn_then(struct forthvm *vm);
+void syn_do(struct forthvm *vm);
+void syn_leave(struct forthvm *vm);
+void syn_loop(struct forthvm *vm);
+void syn_plusloop(struct forthvm *vm);
 void syn_nop(struct forthvm *vm);
 
 #endif

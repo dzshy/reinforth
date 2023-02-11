@@ -23,15 +23,19 @@
 #include "vm.h"
 
 char *syntax_name[SYN_NOP] = {
-    [SYN_COLON] = ":",     [SYN_SEMI] = ";", [SYN_BEGIN] = "begin",
-    [SYN_UNTIL] = "until", [SYN_IF] = "if",  [SYN_ELSE] = "else",
-    [SYN_THEN] = "then",
+    [SYN_COLON] = ":",     [SYN_SEMI] = ";",         [SYN_BEGIN] = "begin",
+    [SYN_UNTIL] = "until", [SYN_IF] = "if",          [SYN_ELSE] = "else",
+    [SYN_THEN] = "then",   [SYN_DO] = "do",          [SYN_LEAVE] = "leave",
+    [SYN_LOOP] = "loop",   [SYN_PLUSLOOP] = "+loop",
 };
 
 opfunc syntax_ops[SYN_NOP + 1] = {
-    [SYN_COLON] = syn_colon, [SYN_SEMI] = syn_semi, [SYN_BEGIN] = syn_begin,
-    [SYN_UNTIL] = syn_until, [SYN_IF] = syn_if,     [SYN_ELSE] = syn_else,
+    [SYN_COLON] = syn_colon, [SYN_SEMI] = syn_semi,
+    [SYN_BEGIN] = syn_begin, [SYN_UNTIL] = syn_until,
+    [SYN_IF] = syn_if,       [SYN_ELSE] = syn_else,
     [SYN_THEN] = syn_then,   [SYN_NOP] = syn_nop,
+    [SYN_DO] = syn_do,       [SYN_LEAVE] = syn_leave,
+    [SYN_LOOP] = syn_loop,   [SYN_PLUSLOOP] = syn_plusloop,
 };
 
 int get_syntax(char *word)
@@ -111,6 +115,105 @@ void syn_else(struct forthvm *vm)
     vm_push_rs(vm, SYN_ELSE);
     vm_emit_opcode(vm, -1);
     vm->code[d] = vm->codesz;
+}
+
+void syn_do(struct forthvm *vm)
+{
+    if (vm->ready) {
+        vm->finished = true;
+        vm->ret = -1;
+        vm->errmsg = "invalid word during interpreting";
+        return;
+    }
+    vm_emit_opcode(vm, OP_SWAP);
+    vm_emit_opcode(vm, OP_D2R);
+    vm_emit_opcode(vm, OP_D2R);
+    vm_emit_opcode(vm, OP_DO);
+    vm_push_rs(vm, vm->codesz);
+    vm_emit_data(vm, -1);
+    vm_push_rs(vm, SYN_DO);
+}
+
+void syn_leave(struct forthvm *vm)
+{
+    if (vm->ready) {
+        vm->finished = true;
+        vm->ret = -1;
+        vm->errmsg = "invalid word during interpreting";
+        return;
+    }
+    if (vm->rs[vm->rsp] != SYN_DO && vm->rs[vm->rsp] != SYN_LEAVE) {
+        vm->finished = true;
+        vm->ret = -1;
+        vm->errmsg = "not a do loop, cannot leave";
+        return;
+    }
+    vm_emit_opcode(vm, OP_JMP);
+    vm_push_rs(vm, vm->codesz);
+    vm_emit_data(vm, -1);
+    vm_push_rs(vm, SYN_LEAVE);
+}
+
+void syn_loop(struct forthvm *vm)
+{
+    vm_emit_opcode(vm, OP_LOOP);
+    vm_emit_opcode(vm, OP_JMP);
+    data begin_pos_ptr = vm->codesz;
+    vm_emit_data(vm, -1);
+    data end = vm->codesz;
+    while (1) {
+        data ins = vm_pop_rs(vm);
+        if (ins == SYN_DO) {
+            data begin_pos = vm_pop_rs(vm);
+            vm->code[begin_pos_ptr] = begin_pos - 1;
+            vm->code[begin_pos] = end;
+            vm_emit_opcode(vm, OP_R2D);
+            vm_emit_opcode(vm, OP_DROP);
+            vm_emit_opcode(vm, OP_R2D);
+            vm_emit_opcode(vm, OP_DROP);
+            break;
+        }
+        if (ins == SYN_LEAVE) {
+            vm->code[vm_pop_rs(vm)] = end;
+            continue;
+        } else {
+            vm->finished = true;
+            vm->ret = -1;
+            vm->errmsg = "unpaired loop";
+            return;
+        }
+    }
+}
+
+void syn_plusloop(struct forthvm *vm)
+{
+    vm_emit_opcode(vm, OP_PLUSLOOP);
+    vm_emit_opcode(vm, OP_JMP);
+    data begin_pos_ptr = vm->codesz;
+    vm_emit_data(vm, -1);
+    data end = vm->codesz;
+    while (1) {
+        data ins = vm_pop_rs(vm);
+        if (ins == SYN_DO) {
+            data begin_pos = vm_pop_rs(vm);
+            vm->code[begin_pos_ptr] = begin_pos - 1;
+            vm->code[begin_pos] = end;
+            vm_emit_opcode(vm, OP_R2D);
+            vm_emit_opcode(vm, OP_DROP);
+            vm_emit_opcode(vm, OP_R2D);
+            vm_emit_opcode(vm, OP_DROP);
+            break;
+        }
+        if (ins == SYN_LEAVE) {
+            vm->code[vm_pop_rs(vm)] = end;
+            continue;
+        } else {
+            vm->finished = true;
+            vm->ret = -1;
+            vm->errmsg = "unpaired +loop";
+            return;
+        }
+    }
 }
 
 void syn_then(struct forthvm *vm)

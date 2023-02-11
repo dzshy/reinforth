@@ -47,9 +47,10 @@ int main(int argc, char **argv)
     load_ext(&vm);
     vm_run(&vm);
     if (vm.ret == -2) {
-        fprintf(stderr, "Assertion failed: %s:%d\n", filename, vm.linenum);
+        fprintf(stderr, "Assertion failed at %s:%d\n", filename, vm.linenum);
     } else if (vm.ret < 0) {
-        fprintf(stderr, "VM error: %s\n", vm.errmsg);
+        fprintf(stderr, "VM error at %s:%d: %s\n", filename, vm.linenum,
+                vm.errmsg);
     }
     return vm.ret;
 }
