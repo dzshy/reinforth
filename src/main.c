@@ -17,6 +17,17 @@
 
 #include "vm.h"
 
+// begin extension demo
+void myadd(struct forthvm *vm)
+{
+    data a = vm_pop_ds(vm);
+    data b = vm_pop_ds(vm);
+    vm_push_ds(vm, a + b);
+}
+
+void load_ext(struct forthvm *vm) { vm_regfunc(vm, "__myadd__", myadd); }
+// end extension demo
+
 int main(int argc, char **argv)
 {
     struct forthvm vm;
@@ -32,10 +43,12 @@ int main(int argc, char **argv)
         filename = argv[1];
     }
     vm_init(&vm, fin, stdout);
+    // extensions must be loaded after initialization
+    load_ext(&vm);
     vm_run(&vm);
     if (vm.ret == -2) {
         fprintf(stderr, "Assertion failed: %s:%d\n", filename, vm.linenum);
-    } else if (vm.ret < 0){
+    } else if (vm.ret < 0) {
         fprintf(stderr, "VM error: %s\n", vm.errmsg);
     }
     return vm.ret;

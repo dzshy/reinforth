@@ -153,7 +153,7 @@ void vm_init(struct forthvm *vm, FILE *fin, FILE *fout)
     vm->ready = true;
     vm->errmsg = "";
 
-    for (data i = 0; i < (data)OP_NOP; i++) {
+    for (data i = 0; i < (data)OP_NOP + 1; i++) {
         find_word(vm, get_opname((enum opcode)i));
     }
 
@@ -244,16 +244,33 @@ data vm_read_word(struct forthvm *vm)
     return find_word(vm, vm->curword);
 }
 
-char vm_getc(struct forthvm *vm) {
-    char c = fgetc(vm->in); 
-    if (c == '\n') vm->linenum++;
+char vm_getc(struct forthvm *vm)
+{
+    char c = fgetc(vm->in);
+    if (c == '\n')
+        vm->linenum++;
     return c;
 }
 
-void vm_ungetc(struct forthvm *vm, char c) {
-    if (c == EOF) return;
-    if (c == '\n') vm->linenum--;
+void vm_ungetc(struct forthvm *vm, char c)
+{
+    if (c == EOF)
+        return;
+    if (c == '\n')
+        vm->linenum--;
     ungetc(c, vm->in);
+}
+
+void vm_regfunc(struct forthvm *vm, char *word, opfunc f)
+{
+    data entry = find_word(vm, word);
+    data faddr = *(data *)&f;
+    vm_emit_opcode(vm, OP_JMP);
+    vm_emit_data(vm, vm->codesz + 4);
+    vm->dict[entry] = vm->codesz;
+    vm_emit_opcode(vm, OP_CFUNC);
+    vm_emit_data(vm, faddr);
+    vm_emit_opcode(vm, OP_EXIT);
 }
 
 void vm_run(struct forthvm *vm)

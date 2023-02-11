@@ -78,11 +78,17 @@ enum opcode {
     OP_D2R,
     OP_R2D,
     OP_RAT,
+    OP_EXECUTE,
+    OP_QUOTE,
+    OP_CFUNC,
     OP_NOP,
 };
 
 struct forthvm;
 
+void op_execute(struct forthvm *vm);
+void op_quote(struct forthvm *vm);
+void op_cfunc(struct forthvm *vm);
 void op_pick(struct forthvm *vm);
 void op_rpick(struct forthvm *vm);
 void op_r2d(struct forthvm *vm);

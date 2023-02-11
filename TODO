@@ -1,11 +1,8 @@
-execute
-'
-cfunc
-
+i
+i'
+j
 do ... leave ... loop
 do ... leave ... +loop
-i
-j
 
 begin ... while ... repeat
 begin ... until

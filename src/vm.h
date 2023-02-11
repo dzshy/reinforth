@@ -71,6 +71,7 @@ void vm_emit_opcode(struct forthvm *vm, enum opcode);
 void vm_heap_grow(struct forthvm *vm, data size);
 char vm_getc(struct forthvm *vm);
 void vm_ungetc(struct forthvm *vm, char c);
+void vm_regfunc(struct forthvm *vm, char *word, opfunc f);
 
 data vm_execute(struct forthvm *vm);
 void vm_init(struct forthvm *vm, FILE *fin, FILE *fout);

@@ -102,66 +102,42 @@ char *op_vec[OP_NOP + 1] = {
     [OP_R2D] = "r>",
     [OP_D2R] = ">r",
     [OP_RAT] = "r@",
+    [OP_EXECUTE] = "execute",
+    [OP_QUOTE] = "'",
+    [OP_CFUNC] = "cfunc\t",
 };
 
 opfunc op_funcvec[OP_NOP + 1] = {
-    [OP_PICK] = op_pick,
-    [OP_RPICK] = op_rpick,
-    [OP_R2D] = op_r2d,
-    [OP_D2R] = op_d2r,
-    [OP_RAT] = op_rat,
-    [OP_DUMP] = op_dump,
-    [OP_RDUMP] = op_rdump,
-    [OP_DEPTH] = op_depth,
-    [OP_ASSERT] = op_assert,
-    [OP_EMIT] = op_emit,
-    [OP_ROT] = op_rot,
-    [OP_PRINT] = op_print,
-    [OP_COMMA] = op_comma,
-    [OP_HERE] = op_here,
-    [OP_CR] = op_cr,
-    [OP_ADD] = op_add,
-    [OP_MINUS] = op_minus,
-    [OP_MUL] = op_mul,
-    [OP_DIV] = op_div,
-    [OP_MOD] = op_mod,
-    [OP_DIVMOD] = op_divmod,
-    [OP_MIN] = op_min,
-    [OP_MAX] = op_max,
-    [OP_NEGATE] = op_negate,
-    [OP_EQ] = op_eq,
-    [OP_NEQ] = op_neq,
-    [OP_GT] = op_gt,
-    [OP_LT] = op_lt,
-    [OP_GE] = op_ge,
-    [OP_LE] = op_le,
-    [OP_AND] = op_and,
-    [OP_OR] = op_or,
-    [OP_NOT] = op_not,
-    [OP_BITAND] = op_bitand,
-    [OP_BITOR] = op_bitor,
-    [OP_INVERT] = op_invert,
-    [OP_XOR] = op_xor,
-    [OP_DUP] = op_dup,
-    [OP_OVER] = op_over,
-    [OP_SWAP] = op_swap,
-    [OP_DROP] = op_drop,
-    [OP_DOT] = op_dot,
-    [OP_CALL] = op_call,
-    [OP_PUSH] = op_push,
-    [OP_CREATE] = op_create,
-    [OP_BYE] = op_bye,
-    [OP_EXIT] = op_exit,
-    [OP_JMP] = op_jmp,
-    [OP_JZ] = op_jz,
-    [OP_CELLS] = op_cells,
-    [OP_CHARS] = op_chars,
-    [OP_ALLOT] = op_allot,
-    [OP_ALLOCATE] = op_allocate,
-    [OP_RESIZE] = op_resize,
-    [OP_FREE] = op_free,
-    [OP_BANG] = op_bang,
-    [OP_AT] = op_at,
+    [OP_EXECUTE] = op_execute, [OP_QUOTE] = op_quote,
+    [OP_CFUNC] = op_cfunc,     [OP_PICK] = op_pick,
+    [OP_RPICK] = op_rpick,     [OP_R2D] = op_r2d,
+    [OP_D2R] = op_d2r,         [OP_RAT] = op_rat,
+    [OP_DUMP] = op_dump,       [OP_RDUMP] = op_rdump,
+    [OP_DEPTH] = op_depth,     [OP_ASSERT] = op_assert,
+    [OP_EMIT] = op_emit,       [OP_ROT] = op_rot,
+    [OP_PRINT] = op_print,     [OP_COMMA] = op_comma,
+    [OP_HERE] = op_here,       [OP_CR] = op_cr,
+    [OP_ADD] = op_add,         [OP_MINUS] = op_minus,
+    [OP_MUL] = op_mul,         [OP_DIV] = op_div,
+    [OP_MOD] = op_mod,         [OP_DIVMOD] = op_divmod,
+    [OP_MIN] = op_min,         [OP_MAX] = op_max,
+    [OP_NEGATE] = op_negate,   [OP_EQ] = op_eq,
+    [OP_NEQ] = op_neq,         [OP_GT] = op_gt,
+    [OP_LT] = op_lt,           [OP_GE] = op_ge,
+    [OP_LE] = op_le,           [OP_AND] = op_and,
+    [OP_OR] = op_or,           [OP_NOT] = op_not,
+    [OP_BITAND] = op_bitand,   [OP_BITOR] = op_bitor,
+    [OP_INVERT] = op_invert,   [OP_XOR] = op_xor,
+    [OP_DUP] = op_dup,         [OP_OVER] = op_over,
+    [OP_SWAP] = op_swap,       [OP_DROP] = op_drop,
+    [OP_DOT] = op_dot,         [OP_CALL] = op_call,
+    [OP_PUSH] = op_push,       [OP_CREATE] = op_create,
+    [OP_BYE] = op_bye,         [OP_EXIT] = op_exit,
+    [OP_JMP] = op_jmp,         [OP_JZ] = op_jz,
+    [OP_CELLS] = op_cells,     [OP_CHARS] = op_chars,
+    [OP_ALLOT] = op_allot,     [OP_ALLOCATE] = op_allocate,
+    [OP_RESIZE] = op_resize,   [OP_FREE] = op_free,
+    [OP_BANG] = op_bang,       [OP_AT] = op_at,
     [OP_NOP] = op_nop,
 };
 
@@ -583,6 +559,12 @@ void op_bye(struct forthvm *vm)
     vm->ret = 0;
 }
 
+void op_quote(struct forthvm *vm)
+{
+    data a = vm_read_word(vm);
+    vm_push_ds(vm, a);
+}
+
 void op_create(struct forthvm *vm)
 {
     vm_emit_opcode(vm, OP_JMP);
@@ -628,6 +610,33 @@ void op_exit(struct forthvm *vm)
 {
     data addr = vm_pop_rs(vm);
     vm->pc = addr;
+}
+
+void op_execute(struct forthvm *vm)
+{
+    data entry = vm_pop_ds(vm);
+    CHECKERR;
+    if (entry <= OP_NOP) {
+        opfunc f = get_opfunc(entry);
+        (*f)(vm);
+        return;
+    }
+    data addr = vm->dict[entry];
+    if (addr < 0) {
+        vm->finished = true;
+        vm->ret = -1;
+        vm->errmsg = "undefined word";
+    }
+    vm_push_rs(vm, vm->pc);
+    vm->pc = addr - 1;
+}
+
+void op_cfunc(struct forthvm *vm)
+{
+    vm->pc++;
+    data addr = vm->code[vm->pc];
+    opfunc f = *(opfunc *)&addr;
+    (*f)(vm);
 }
 
 void op_call(struct forthvm *vm)
