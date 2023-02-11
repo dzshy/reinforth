@@ -24,7 +24,10 @@ enum syntax {
     SYN_COLON,
     SYN_SEMI,
     SYN_BEGIN,
+    SYN_AGAIN,
     SYN_UNTIL,
+    SYN_WHILE,
+    SYN_REPEAT,
     SYN_IF,
     SYN_ELSE,
     SYN_THEN,
@@ -42,6 +45,9 @@ void syn_colon(struct forthvm *vm);
 void syn_semi(struct forthvm *vm);
 void syn_begin(struct forthvm *vm);
 void syn_until(struct forthvm *vm);
+void syn_again(struct forthvm *vm);
+void syn_while(struct forthvm *vm);
+void syn_repeat(struct forthvm *vm);
 void syn_if(struct forthvm *vm);
 void syn_else(struct forthvm *vm);
 void syn_then(struct forthvm *vm);
