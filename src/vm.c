@@ -161,6 +161,13 @@ void vm_init(struct forthvm *vm, FILE *fin, FILE *fout)
     vm->out = fout;
 }
 
+void vm_heapsz(struct forthvm *vm, data sz)
+{
+    vm->heap = realloc(vm->heap, sz);
+    vm->heaptop = vm->heap;
+    vm->heapcap = sz;
+}
+
 data vm_execute(struct forthvm *vm)
 {
     if (!vm->ready)

@@ -87,6 +87,7 @@ enum opcode {
     OP_I,
     OP_II,
     OP_J,
+    OP_HEAPSIZE,
     OP_NOP,
 };
 
@@ -158,6 +159,7 @@ void op_free(struct forthvm *vm);
 void op_bang(struct forthvm *vm);
 void op_at(struct forthvm *vm);
 void op_print(struct forthvm *vm);
+void op_heapsize(struct forthvm *vm);
 void op_nop(struct forthvm *vm);
 
 char *get_opname(enum opcode);

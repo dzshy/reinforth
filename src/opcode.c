@@ -112,6 +112,7 @@ char *op_vec[OP_NOP + 1] = {
     [OP_I] = "i",
     [OP_II] = "i'",
     [OP_J] = "j",
+    [OP_HEAPSIZE] = "heap-size",
 };
 
 opfunc op_funcvec[OP_NOP + 1] = {
@@ -182,6 +183,7 @@ opfunc op_funcvec[OP_NOP + 1] = {
     [OP_BANG] = op_bang,
     [OP_AT] = op_at,
     [OP_NOP] = op_nop,
+    [OP_HEAPSIZE] = op_heapsize,
 };
 
 char *get_opname(enum opcode op) { return op_vec[(int)op]; }
@@ -192,6 +194,13 @@ data get_opaddr(enum opcode op)
 {
     opfunc f = op_funcvec[(int)op];
     return *(data *)&f;
+}
+
+void op_heapsize(struct forthvm *vm)
+{
+    data sz = vm_pop_ds(vm);
+    CHECKERR;
+    vm_heapsz(vm, sz);
 }
 
 void op_i(struct forthvm *vm)

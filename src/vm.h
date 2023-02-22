@@ -68,6 +68,7 @@ void vm_push_rs(struct forthvm *vm, data d);
 data vm_read_word(struct forthvm *vm);
 void vm_emit_data(struct forthvm *vm, data d);
 void vm_emit_opcode(struct forthvm *vm, enum opcode);
+void vm_heapsz(struct forthvm *vm, data size);
 void vm_heap_grow(struct forthvm *vm, data size);
 char vm_getc(struct forthvm *vm);
 void vm_ungetc(struct forthvm *vm, char c);
